@@ -528,3 +528,54 @@ main {
 .error-state p {
   margin: 0;
 }
+.servings-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.servings-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.servings-selector button {
+  width: 34px;
+  height: 34px;
+
+  border: 0px solid #d4d4d4;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+}
+
+.servings-selector button:hover:not(:disabled) {
+  background: #f3f3f3;
+}
+
+.servings-selector button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.servings-selector button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.servings-selector span {
+  min-width: 28px;
+
+  text-align: center;
+
+  font-size: 18px;
+  font-weight: 600;
+}

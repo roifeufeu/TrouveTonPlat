@@ -55,6 +55,8 @@ function Recipe() {
   const { id } = useParams();
 
   const [recipe, setRecipe] = useState(null);
+  const [servings, setServings] = useState(1);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -64,6 +66,10 @@ function Recipe() {
         const data = await getRecipeById(id);
 
         setRecipe(data);
+
+        // On utilise le nombre de portions fourni par Spoonacular
+        // comme valeur de départ.
+        setServings(data.servings || 1);
       } catch (error) {
         console.error(error);
 
@@ -77,6 +83,14 @@ function Recipe() {
 
     loadRecipe();
   }, [id]);
+
+  function decreaseServings() {
+    setServings((currentServings) => Math.max(1, currentServings - 1));
+  }
+
+  function increaseServings() {
+    setServings((currentServings) => currentServings + 1);
+  }
 
   if (loading) {
     return (
@@ -109,6 +123,11 @@ function Recipe() {
     );
   }
 
+  // Ratio entre les portions choisies par l'utilisateur
+  // et les portions originales de la recette.
+  const originalServings = recipe.servings || 1;
+  const servingsRatio = servings / originalServings;
+
   return (
     <main className="recipe-page">
       <section className="recipe-header">
@@ -117,9 +136,30 @@ function Recipe() {
         <div className="recipe-summary">
           <h1>{recipe.title}</h1>
 
-          <p>
-            <strong>Portions :</strong> {recipe.servings}
-          </p>
+          <div className="servings-control">
+            <strong>Portions :</strong>
+
+            <div className="servings-selector">
+              <button
+                type="button"
+                onClick={decreaseServings}
+                disabled={servings <= 1}
+                aria-label="Réduire le nombre de portions"
+              >
+                −
+              </button>
+
+              <span>{servings}</span>
+
+              <button
+                type="button"
+                onClick={increaseServings}
+                aria-label="Augmenter le nombre de portions"
+              >
+                +
+              </button>
+            </div>
+          </div>
 
           {recipe.readyInMinutes && (
             <p>
@@ -133,19 +173,25 @@ function Recipe() {
         <h2>Ingrédients</h2>
 
         <ul className="ingredients-list">
-          {recipe.ingredients.map((ingredient, index) => (
-            <li key={`${ingredient.id}-${index}`}>
-              <strong>{ingredient.name}</strong>
+          {recipe.ingredients.map((ingredient, index) => {
+            const adjustedAmount =
+              ingredient.amount != null
+                ? ingredient.amount * servingsRatio
+                : null;
 
-              {ingredient.amount != null && (
-                <>
-                  {" — "}
-                  {formatAmount(ingredient.amount)}{" "}
-                  {formatUnit(ingredient.unit)}
-                </>
-              )}
-            </li>
-          ))}
+            return (
+              <li key={`${ingredient.id}-${index}`}>
+                <strong>{ingredient.name}</strong>
+
+                {adjustedAmount != null && (
+                  <>
+                    {" — "}
+                    {formatAmount(adjustedAmount)} {formatUnit(ingredient.unit)}
+                  </>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
 
