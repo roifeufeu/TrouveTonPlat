@@ -346,6 +346,8 @@ app.get("/api/recipes/:id", async (req, res) => {
           amount: metric?.amount ?? ingredient.amount ?? null,
 
           unit: metric?.unitShort || ingredient.unit || "",
+
+          image: ingredient.image || null,
         };
       }),
 

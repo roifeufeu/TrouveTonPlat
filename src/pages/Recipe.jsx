@@ -42,6 +42,11 @@ function formatUnit(unit) {
     small: "petite",
     medium: "moyenne",
 
+    clove: "gousse",
+    cloves: "gousses",
+
+    link: "saucisse",
+    links: "saucisses",
     g: "g",
     kg: "kg",
     ml: "ml",
@@ -181,14 +186,24 @@ function Recipe() {
 
             return (
               <li key={`${ingredient.id}-${index}`}>
-                <strong>{ingredient.name}</strong>
-
-                {adjustedAmount != null && (
-                  <>
-                    {" — "}
-                    {formatAmount(adjustedAmount)} {formatUnit(ingredient.unit)}
-                  </>
+                {ingredient.image && (
+                  <img
+                    className="ingredient-image"
+                    src={`https://img.spoonacular.com/ingredients_100x100/${ingredient.image}`}
+                    alt={ingredient.name}
+                  />
                 )}
+
+                <div className="ingredient-info">
+                  <strong>{ingredient.name}</strong>
+
+                  {adjustedAmount != null && (
+                    <span>
+                      {formatAmount(adjustedAmount)}{" "}
+                      {formatUnit(ingredient.unit)}
+                    </span>
+                  )}
+                </div>
               </li>
             );
           })}

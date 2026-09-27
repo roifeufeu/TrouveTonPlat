@@ -596,3 +596,27 @@ main {
 
   cursor: pointer;
 }
+.ingredients-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ingredient-image {
+  width: 55px;
+  height: 55px;
+
+  object-fit: contain;
+
+  flex-shrink: 0;
+}
+
+.ingredient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ingredient-info span {
+  color: #666;
+}
