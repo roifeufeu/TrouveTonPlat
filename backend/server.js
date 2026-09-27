@@ -159,6 +159,11 @@ app.get("/api/test", (req, res) => {
 app.get("/api/recipes/search", async (req, res) => {
   const query = String(req.query.q || "").trim();
   const offset = Number(req.query.offset || 0);
+  const vegetarian = req.query.vegetarian === "true";
+  const vegan = req.query.vegan === "true";
+  const noPork = req.query.noPork === "true";
+  const glutenFree = req.query.glutenFree === "true";
+  const dairyFree = req.query.dairyFree === "true";
 
   if (query.length < 2 || query.length > 100) {
     return res.status(400).json({
@@ -181,6 +186,30 @@ app.get("/api/recipes/search", async (req, res) => {
       offset: String(offset),
       apiKey: SPOONACULAR_API_KEY,
     });
+
+    if (vegan) {
+      params.set("diet", "vegan");
+    } else if (vegetarian) {
+      params.set("diet", "vegetarian");
+    }
+
+    if (noPork) {
+      params.set("excludeIngredients", "pork");
+    }
+
+    const intolerances = [];
+
+    if (glutenFree) {
+      intolerances.push("gluten");
+    }
+
+    if (dairyFree) {
+      intolerances.push("dairy");
+    }
+
+    if (intolerances.length > 0) {
+      params.set("intolerances", intolerances.join(","));
+    }
 
     const response = await fetch(
       `${SPOONACULAR_BASE_URL}/recipes/complexSearch?${params}`,

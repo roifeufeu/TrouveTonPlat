@@ -14,7 +14,31 @@ function Home() {
   const [error, setError] = useState("");
   const [totalResults, setTotalResults] = useState(0);
 
+  const [vegetarian, setVegetarian] = useState(false);
+  const [vegan, setVegan] = useState(false);
+  const [noPork, setNoPork] = useState(false);
+  const [glutenFree, setGlutenFree] = useState(false);
+  const [dairyFree, setDairyFree] = useState(false);
+
+  const [activeFilters, setActiveFilters] = useState({
+    vegetarian: false,
+    vegan: false,
+    noPork: false,
+    glutenFree: false,
+    dairyFree: false,
+  });
+
   async function handleSearch(query) {
+    const filters = {
+      vegetarian,
+      vegan,
+      noPork,
+      glutenFree,
+      dairyFree,
+    };
+
+    setActiveFilters(filters);
+
     setSearch(query);
     setLoading(true);
     setError("");
@@ -24,7 +48,7 @@ function Home() {
     setTotalResults(0);
 
     try {
-      const data = await searchRecipes(query, 0);
+      const data = await searchRecipes(query, 0, filters);
 
       setRecipes(data.results);
       setTotalResults(data.totalResults);
@@ -32,8 +56,9 @@ function Home() {
       console.error(error);
 
       setError(
-        "Impossible de charger davantage de recettes. Réessayez dans quelques instants.",
+        "Impossible de récupérer les recettes. Vérifiez votre connexion et réessayez.",
       );
+
       setRecipes([]);
       setTotalResults(0);
     } finally {
@@ -61,7 +86,7 @@ function Home() {
     setError("");
 
     try {
-      const data = await searchRecipes(search, recipes.length);
+      const data = await searchRecipes(search, recipes.length, activeFilters);
 
       if (data.results.length === 0) {
         setTotalResults(recipes.length);
@@ -90,8 +115,6 @@ function Home() {
 
   return (
     <>
-      
-
       <main>
         <section className="hero">
           <h1>Trouvez la recette qu'il vous faut</h1>
@@ -102,6 +125,52 @@ function Home() {
           </p>
 
           <SearchBar onSearch={handleSearch} />
+
+          <div className="search-filters">
+            <label>
+              <input
+                type="checkbox"
+                checked={vegetarian}
+                onChange={(event) => setVegetarian(event.target.checked)}
+              />
+              Végétarien
+            </label>
+
+            <label>
+              <input
+                type="checkbox"
+                checked={vegan}
+                onChange={(event) => setVegan(event.target.checked)}
+              />
+              Vegan
+            </label>
+
+            <label>
+              <input
+                type="checkbox"
+                checked={noPork}
+                onChange={(event) => setNoPork(event.target.checked)}
+              />
+              Sans porc
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={glutenFree}
+                onChange={(event) => setGlutenFree(event.target.checked)}
+              />
+              Sans gluten
+            </label>
+
+            <label>
+              <input
+                type="checkbox"
+                checked={dairyFree}
+                onChange={(event) => setDairyFree(event.target.checked)}
+              />
+              Sans produits laitiers
+            </label>
+          </div>
         </section>
 
         {search && (

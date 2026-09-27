@@ -1,9 +1,31 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export async function searchRecipes(query, offset = 0) {
-  const response = await fetch(
-    `${BASE_URL}/api/recipes/search?q=${encodeURIComponent(query)}&offset=${offset}`,
-  );
+export async function searchRecipes(query, offset = 0, filters = {}) {
+  const params = new URLSearchParams({
+    q: query,
+    offset: String(offset),
+  });
+
+  if (filters.vegetarian) {
+    params.set("vegetarian", "true");
+  }
+
+  if (filters.vegan) {
+    params.set("vegan", "true");
+  }
+
+  if (filters.noPork) {
+    params.set("noPork", "true");
+  }
+  if (filters.glutenFree) {
+    params.set("glutenFree", "true");
+  }
+
+  if (filters.dairyFree) {
+    params.set("dairyFree", "true");
+  }
+
+  const response = await fetch(`${BASE_URL}/api/recipes/search?${params}`);
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
