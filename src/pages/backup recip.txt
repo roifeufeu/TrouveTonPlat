@@ -23,7 +23,38 @@ function formatUnit(unit) {
 
   const normalizedUnit = unit.toLowerCase();
 
-  return unitTranslations[normalizedUnit] || unit;
+  const units = {
+    tsp: "cuillère à café",
+    tsps: "cuillères à café",
+
+    tbsp: "cuillère à soupe",
+    tbsps: "cuillères à soupe",
+
+    cup: "tasse",
+    cups: "tasses",
+
+    serving: "portion",
+    servings: "portions",
+
+    piece: "pièce",
+    pieces: "pièces",
+
+    large: "grande",
+    small: "petite",
+    medium: "moyenne",
+
+    clove: "gousse",
+    cloves: "gousses",
+
+    link: "saucisse",
+    links: "saucisses",
+    g: "g",
+    kg: "kg",
+    ml: "ml",
+    l: "l",
+  };
+
+  return units[normalizedUnit] || unit;
 }
 
 function Recipe() {
