@@ -307,13 +307,50 @@ app.get("/api/recipes/:id", async (req, res) => {
       (ingredient) => ingredient.nameClean || ingredient.name || "",
     );
 
-    const textsToTranslate = [data.title || "", ...ingredientNames];
+    const instructionSections = Array.isArray(data.analyzedInstructions)
+      ? data.analyzedInstructions
+      : [];
+
+    const instructionSectionNames = instructionSections.map(
+      (section) => section.name || "",
+    );
+
+    const instructionSteps = instructionSections.flatMap((section) =>
+      Array.isArray(section.steps) ? section.steps : [],
+    );
+
+    const instructionTexts = instructionSteps.map((step) => step.step || "");
+
+    const textsToTranslate = [
+      data.title || "",
+      ...ingredientNames,
+      ...instructionSectionNames,
+      ...instructionTexts,
+    ];
 
     const translatedTexts = await translateTexts(textsToTranslate, "en", "fr");
 
     const translatedTitle = translatedTexts[0] || data.title;
 
-    const translatedIngredients = translatedTexts.slice(1);
+    const ingredientStart = 1;
+    const ingredientEnd = ingredientStart + ingredientNames.length;
+
+    const sectionNameStart = ingredientEnd;
+    const sectionNameEnd = sectionNameStart + instructionSectionNames.length;
+
+    const instructionStart = sectionNameEnd;
+
+    const translatedIngredients = translatedTexts.slice(
+      ingredientStart,
+      ingredientEnd,
+    );
+
+    const translatedSectionNames = translatedTexts.slice(
+      sectionNameStart,
+      sectionNameEnd,
+    );
+
+    const translatedInstructionSteps = translatedTexts.slice(instructionStart);
 
     const nutrientTranslations = {
       Calories: "Calories",
@@ -325,12 +362,36 @@ app.get("/api/recipes/:id", async (req, res) => {
       Sodium: "Sodium",
     };
 
+    let translatedStepIndex = 0;
+
+    const translatedInstructions = instructionSections.map(
+      (section, sectionIndex) => ({
+        name: translatedSectionNames[sectionIndex] || section.name || "",
+
+        steps: Array.isArray(section.steps)
+          ? section.steps.map((step) => {
+              const translatedStep =
+                translatedInstructionSteps[translatedStepIndex];
+
+              translatedStepIndex += 1;
+
+              return {
+                number: step.number,
+                step: translatedStep || step.step,
+              };
+            })
+          : [],
+      }),
+    );
+
     const recipe = {
       id: data.id,
       title: translatedTitle,
       image: data.image,
       servings: data.servings,
       readyInMinutes: data.readyInMinutes,
+
+      instructions: translatedInstructions,
 
       ingredients: ingredients.map((ingredient, index) => {
         const metric = ingredient.measures?.metric;
@@ -366,7 +427,6 @@ app.get("/api/recipes/:id", async (req, res) => {
           )
           .map((nutrient) => ({
             name: nutrientTranslations[nutrient.name] || nutrient.name,
-
             amount: nutrient.amount,
             unit: nutrient.unit,
           })) || [],

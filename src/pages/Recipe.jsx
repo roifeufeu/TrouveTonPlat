@@ -180,6 +180,31 @@ function Recipe() {
         </ul>
       </section>
 
+      {recipe.instructions?.some((section) => section.steps?.length > 0) && (
+        <section className="recipe-section">
+          <h2>Préparation</h2>
+
+          <div className="instructions-list">
+            {recipe.instructions.map((section, sectionIndex) => (
+              <div className="instruction-section" key={sectionIndex}>
+                {section.name && <h3>{section.name}</h3>}
+
+                {section.steps.map((step, stepIndex) => (
+                  <div
+                    className="instruction-step"
+                    key={`${sectionIndex}-${step.number}-${stepIndex}`}
+                  >
+                    <span className="step-number">{step.number}</span>
+
+                    <p>{step.step}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {recipe.nutrition.length > 0 && (
         <section className="recipe-section">
           <h2>Nutrition</h2>
