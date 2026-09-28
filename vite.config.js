@@ -17,8 +17,8 @@ export default defineConfig({
 	},
 
       manifest: {
-        name: "Projet Recettes",
-        short_name: "Recettes",
+        name: "Trouve Ton Plat",
+        short_name: "TrouveTonPlat",
 
         description:
           "Recherchez un plat et obtenez ses ingrédients et ses quantités.",

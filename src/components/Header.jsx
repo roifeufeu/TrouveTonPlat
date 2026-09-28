@@ -15,26 +15,17 @@ function Header() {
       setInstallPrompt(null);
     }
 
-    window.addEventListener(
-      "beforeinstallprompt",
-      handleBeforeInstallPrompt
-    );
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    window.addEventListener(
-      "appinstalled",
-      handleAppInstalled
-    );
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
       window.removeEventListener(
         "beforeinstallprompt",
-        handleBeforeInstallPrompt
+        handleBeforeInstallPrompt,
       );
 
-      window.removeEventListener(
-        "appinstalled",
-        handleAppInstalled
-      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -55,14 +46,11 @@ function Header() {
   return (
     <header className="header">
       <Link to="/" className="logo">
-        Projet Recettes
+        TrouveTonPlat
       </Link>
 
       {installPrompt && (
-        <button
-          className="install-button"
-          onClick={handleInstall}
-        >
+        <button className="install-button" onClick={handleInstall}>
           Installer l'application
         </button>
       )}
