@@ -35,15 +35,14 @@ function Recipe() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [activeTab, setActiveTab] = useState("ingredients");
+
   useEffect(() => {
     async function loadRecipe() {
       try {
         const data = await getRecipeById(id);
 
         setRecipe(data);
-
-        // On utilise le nombre de portions fourni par Spoonacular
-        // comme valeur de départ.
         setServings(data.servings || 1);
       } catch (error) {
         console.error(error);
@@ -98,125 +97,176 @@ function Recipe() {
     );
   }
 
-  // Ratio entre les portions choisies par l'utilisateur
-  // et les portions originales de la recette.
   const originalServings = recipe.servings || 1;
   const servingsRatio = servings / originalServings;
 
+  const hasInstructions =
+    recipe.instructions?.some((section) => section.steps?.length > 0) || false;
+
   return (
     <main className="recipe-page">
-      <section className="recipe-header">
-        <img className="recipe-image" src={recipe.image} alt={recipe.title} />
+      <section className="recipe-hero">
+        <div className="recipe-hero-image-wrapper">
+          <img
+            className="recipe-hero-image"
+            src={recipe.image}
+            alt={recipe.title}
+          />
+        </div>
 
-        <div className="recipe-summary">
+        <div className="recipe-hero-content">
           <h1>{recipe.title}</h1>
 
-          <div className="servings-control">
-            <strong>Portions :</strong>
+          <div className="recipe-meta">
+            {recipe.readyInMinutes && (
+              <div className="recipe-meta-item">
+                <span className="recipe-meta-label">Temps</span>
 
-            <div className="servings-selector">
-              <button
-                type="button"
-                onClick={decreaseServings}
-                disabled={servings <= 1}
-                aria-label="Réduire le nombre de portions"
-              >
-                −
-              </button>
+                <strong>{recipe.readyInMinutes} min</strong>
+              </div>
+            )}
 
-              <span>{servings}</span>
+            <div className="recipe-meta-item">
+              <span className="recipe-meta-label">Portions</span>
 
-              <button
-                type="button"
-                onClick={increaseServings}
-                aria-label="Augmenter le nombre de portions"
-              >
-                +
-              </button>
+              <div className="servings-selector">
+                <button
+                  type="button"
+                  onClick={decreaseServings}
+                  disabled={servings <= 1}
+                  aria-label="Réduire le nombre de portions"
+                >
+                  −
+                </button>
+
+                <span>{servings}</span>
+
+                <button
+                  type="button"
+                  onClick={increaseServings}
+                  aria-label="Augmenter le nombre de portions"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
 
-          {recipe.readyInMinutes && (
-            <p>
-              <strong>Temps :</strong> {recipe.readyInMinutes} min
-            </p>
+          <button
+            type="button"
+            className="print-recipe-button"
+            onClick={() => window.print()}
+          >
+            Imprimer / PDF
+          </button>
+        </div>
+      </section>
+
+      <section className="recipe-section recipe-details-card">
+        <div className="recipe-tabs">
+          <button
+            type="button"
+            className={`recipe-tab ${
+              activeTab === "ingredients" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("ingredients")}
+          >
+            Ingrédients
+          </button>
+
+          <button
+            type="button"
+            className={`recipe-tab ${
+              activeTab === "nutrition" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("nutrition")}
+          >
+            Nutrition
+          </button>
+        </div>
+
+        <div className="recipe-tab-content">
+          {activeTab === "ingredients" && (
+            <ul className="ingredients-list">
+              {recipe.ingredients.map((ingredient, index) => {
+                const adjustedAmount =
+                  ingredient.amount != null
+                    ? ingredient.amount * servingsRatio
+                    : null;
+
+                return (
+                  <li key={`${ingredient.id}-${index}`}>
+                    {ingredient.image && (
+                      <img
+                        className="ingredient-image"
+                        src={`https://img.spoonacular.com/ingredients_100x100/${ingredient.image}`}
+                        alt={ingredient.name}
+                      />
+                    )}
+
+                    <div className="ingredient-info">
+                      <strong>{ingredient.name}</strong>
+
+                      {adjustedAmount != null && (
+                        <span>
+                          {formatAmount(adjustedAmount)}{" "}
+                          {formatUnit(ingredient.unit)}
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          {activeTab === "nutrition" && (
+            <>
+              {recipe.nutrition?.length > 0 ? (
+                <div className="nutrition-grid">
+                  {recipe.nutrition.map((nutrient) => (
+                    <div className="nutrition-item" key={nutrient.name}>
+                      <strong>{nutrient.name}</strong>
+
+                      <span>
+                        {Math.round(nutrient.amount)} {nutrient.unit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="empty-tab-message">
+                  Informations nutritionnelles indisponibles.
+                </p>
+              )}
+            </>
           )}
         </div>
       </section>
 
-      <section className="recipe-section">
-        <h2>Ingrédients</h2>
-
-        <ul className="ingredients-list">
-          {recipe.ingredients.map((ingredient, index) => {
-            const adjustedAmount =
-              ingredient.amount != null
-                ? ingredient.amount * servingsRatio
-                : null;
-
-            return (
-              <li key={`${ingredient.id}-${index}`}>
-                {ingredient.image && (
-                  <img
-                    className="ingredient-image"
-                    src={`https://img.spoonacular.com/ingredients_100x100/${ingredient.image}`}
-                    alt={ingredient.name}
-                  />
-                )}
-
-                <div className="ingredient-info">
-                  <strong>{ingredient.name}</strong>
-
-                  {adjustedAmount != null && (
-                    <span>
-                      {formatAmount(adjustedAmount)}{" "}
-                      {formatUnit(ingredient.unit)}
-                    </span>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      {recipe.instructions?.some((section) => section.steps?.length > 0) && (
+      {hasInstructions && (
         <section className="recipe-section">
           <h2>Préparation</h2>
 
-          <div className="instructions-list">
+          <div className="preparation-card">
             {recipe.instructions.map((section, sectionIndex) => (
               <div className="instruction-section" key={sectionIndex}>
-                {section.name && <h3>{section.name}</h3>}
+                {section.name && (
+                  <h3 className="instruction-section-title">{section.name}</h3>
+                )}
 
                 {section.steps.map((step, stepIndex) => (
                   <div
-                    className="instruction-step"
+                    className="preparation-step"
                     key={`${sectionIndex}-${step.number}-${stepIndex}`}
                   >
-                    <span className="step-number">{step.number}</span>
+                    <div className="preparation-step-number">{step.number}</div>
 
-                    <p>{step.step}</p>
+                    <div className="preparation-step-content">
+                      <p>{step.step}</p>
+                    </div>
                   </div>
                 ))}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {recipe.nutrition.length > 0 && (
-        <section className="recipe-section">
-          <h2>Nutrition</h2>
-
-          <div className="nutrition-grid">
-            {recipe.nutrition.map((nutrient) => (
-              <div className="nutrition-item" key={nutrient.name}>
-                <strong>{nutrient.name}</strong>
-
-                <span>
-                  {Math.round(nutrient.amount)} {nutrient.unit}
-                </span>
               </div>
             ))}
           </div>

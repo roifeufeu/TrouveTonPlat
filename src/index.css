@@ -158,8 +158,8 @@ main {
   }
 
   .hero {
-    min-height: 390px;
-    padding-top: 40px;
+    min-height: auto;
+    padding: 40px 20px 24px;
   }
 
   .install-button {
@@ -337,38 +337,171 @@ main {
   padding: 48px 24px 64px;
 }
 
-.recipe-header {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
+/* RECIPE HERO */
 
-  gap: 40px;
+.recipe-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+
+  gap: 48px;
   align-items: center;
 
   margin-bottom: 48px;
 }
 
-.recipe-image {
+.recipe-hero-image-wrapper {
   width: 100%;
-  max-height: 420px;
+}
+
+.recipe-hero-image {
+  display: block;
+
+  width: 100%;
+  height: 420px;
 
   object-fit: cover;
 
-  border-radius: 16px;
+  border-radius: 18px;
 }
 
-.recipe-summary h1 {
-  margin-top: 0;
-  margin-bottom: 24px;
+.recipe-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  font-size: 2.5rem;
+.recipe-hero-content h1 {
+  margin: 0 0 28px;
+
+  font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.1;
+
+  color: #111827;
 }
 
-.recipe-summary p {
-  margin: 10px 0;
+.recipe-meta {
+  display: flex;
+  gap: 36px;
+  align-items: flex-start;
+
+  margin-bottom: 28px;
+}
+
+.recipe-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-meta-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  color: #6b7280;
+}
+
+.servings-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.servings-selector button {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+
+  background-color: white;
+
+  font-size: 1.15rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.servings-selector button:hover:not(:disabled) {
+  background-color: #fff7ed;
+}
+
+.servings-selector button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.servings-selector span {
+  min-width: 28px;
+
+  text-align: center;
 
   font-size: 1.05rem;
-  color: #4b5563;
+  font-weight: 700;
+}
+
+.print-recipe-button {
+  padding: 12px 18px;
+
+  border: 1px solid #ea580c;
+  border-radius: 9px;
+
+  background-color: white;
+  color: #ea580c;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.print-recipe-button:hover {
+  background-color: #fff7ed;
+}
+
+@media (max-width: 800px) {
+  .recipe-hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .recipe-hero-image {
+    height: 300px;
+  }
+
+  .recipe-hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .recipe-meta {
+    width: 100%;
+    justify-content: space-between;
+
+    gap: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .recipe-hero {
+    gap: 20px;
+  }
+
+  .recipe-hero-image {
+    height: 240px;
+  }
+
+  .recipe-hero-content h1 {
+    margin-bottom: 22px;
+
+    font-size: 1.7rem;
+  }
+
+  .recipe-meta {
+    margin-bottom: 22px;
+  }
+
+  .print-recipe-button {
+    width: 100%;
+  }
 }
 
 .recipe-section {
@@ -447,7 +580,7 @@ main {
   padding: 18px;
 
   background-color: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #ea580c;
   border-radius: 12px;
 }
 
@@ -559,7 +692,7 @@ main {
 }
 
 .servings-selector button:hover:not(:disabled) {
-  background: #f3f3f3;
+  background: #ffedd5;
 }
 
 .servings-selector button:active:not(:disabled) {
@@ -665,8 +798,8 @@ main {
 .footer {
   margin-top: 64px;
   padding: 28px 24px;
-  background-color: #ffffff;
-  border-top: 1px solid #e5e7eb;
+  background-color: #f3e6d3;
+  border-top: 1px solid #ebd9c5;
 }
 .footer-content {
   width: 100%;
@@ -731,7 +864,7 @@ main {
 .footer-copyright {
   margin: 12px 0 0;
 
-  color: #9ca3af;
+  color: #6b7080;
 
   font-size: 0.85rem;
 }
@@ -748,5 +881,183 @@ main {
 
   .footer-links span {
     display: none;
+  }
+}
+/* RECIPE TABS */
+
+.recipe-details-card {
+  padding: 28px;
+
+  background-color: #ffffff;
+
+  border: 1px solid #ea580c;
+  border-radius: 16px;
+}
+
+.recipe-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  margin-bottom: 28px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.recipe-tab {
+  position: relative;
+
+  padding: 14px 18px;
+
+  border: none;
+
+  background: transparent;
+  color: #6b7280;
+
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.recipe-tab:hover {
+  color: #ea580c;
+}
+
+.recipe-tab.active {
+  color: #111827;
+}
+
+.recipe-tab.active::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+
+  height: 3px;
+
+  background-color: #ea580c;
+
+  border-radius: 3px 3px 0 0;
+}
+
+.recipe-tab-content {
+  min-height: 120px;
+}
+
+.empty-tab-message {
+  margin: 0;
+
+  color: #6b7280;
+}
+
+/* On évite le padding de liste classique dans la carte */
+.recipe-details-card .ingredients-list {
+  margin: 0;
+  padding-left: 0;
+
+  list-style: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .recipe-details-card {
+    padding: 20px 16px;
+  }
+
+  .recipe-tab {
+    padding: 12px 10px;
+
+    font-size: 1rem;
+  }
+}
+@media (max-width: 800px) {
+  .nutrition-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 500px) {
+  .nutrition-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* PREPARATION */
+
+.preparation-card {
+  padding: 28px;
+
+  background-color: #ffffff;
+
+  border: 1px solid #ea580c;
+  border-radius: 16px;
+}
+
+.instruction-section-title {
+  margin: 0 0 20px;
+
+  font-size: 1.2rem;
+  color: #111827;
+}
+
+.preparation-step {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+
+  gap: 16px;
+
+  padding: 20px 0;
+
+  border-bottom: 1px solid #ea580c;
+}
+
+.preparation-step:first-child {
+  padding-top: 0;
+}
+
+.preparation-step:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.preparation-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  background-color: #ea580c;
+  color: #ffffff;
+
+  font-weight: 700;
+}
+
+.preparation-step-content p {
+  margin: 4px 0 0;
+
+  line-height: 1.65;
+  color: #374151;
+}
+
+@media (max-width: 600px) {
+  .preparation-card {
+    padding: 20px 16px;
+  }
+
+  .preparation-step {
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+
+    padding: 16px 0;
+  }
+
+  .preparation-step-number {
+    width: 34px;
+    height: 34px;
   }
 }
