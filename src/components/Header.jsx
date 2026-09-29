@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Header() {
   const [installPrompt, setInstallPrompt] = useState(null);
+
+  const location = useLocation();
+
+  function handleLogoClick() {
+    if (location.pathname === "/") {
+      window.dispatchEvent(new Event("reset-home"));
+    }
+  }
 
   useEffect(() => {
     function handleBeforeInstallPrompt(event) {
@@ -44,8 +52,8 @@ function Header() {
   }
 
   return (
-    <header className="header">
-      <Link to="/" className="logo">
+    <header className={`header ${!installPrompt ? "header-centered" : ""}`}>
+      <Link to="/" className="logo" onClick={handleLogoClick}>
         TrouveTonPlat
       </Link>
 

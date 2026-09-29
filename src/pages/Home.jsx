@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import SearchBar from "../components/SearchBar";
 import RecipeCard from "../components/RecipeCard";
@@ -9,6 +9,7 @@ function Home() {
   const [search, setSearch] = useState("");
   const [recipes, setRecipes] = useState([]);
   const [visibleCount, setVisibleCount] = useState(9);
+  const [searchBarKey, setSearchBarKey] = useState(0);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,6 +28,39 @@ function Home() {
     glutenFree: false,
     dairyFree: false,
   });
+
+  useEffect(() => {
+    function resetHome() {
+      setSearch("");
+      setRecipes([]);
+      setVisibleCount(9);
+      setLoading(false);
+      setError("");
+      setTotalResults(0);
+
+      setVegetarian(false);
+      setVegan(false);
+      setNoPork(false);
+      setGlutenFree(false);
+      setDairyFree(false);
+
+      setActiveFilters({
+        vegetarian: false,
+        vegan: false,
+        noPork: false,
+        glutenFree: false,
+        dairyFree: false,
+      });
+
+      setSearchBarKey((current) => current + 1);
+    }
+
+    window.addEventListener("reset-home", resetHome);
+
+    return () => {
+      window.removeEventListener("reset-home", resetHome);
+    };
+  }, []);
 
   async function handleSearch(query) {
     const filters = {
@@ -124,7 +158,7 @@ function Home() {
             quantités nécessaires.
           </p>
 
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar key={searchBarKey} onSearch={handleSearch} />
 
           <div className="search-filters">
             <label>
