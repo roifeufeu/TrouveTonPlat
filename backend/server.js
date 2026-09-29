@@ -29,8 +29,10 @@ if (!SPOONACULAR_API_KEY || !GOOGLE_TRANSLATE_API_KEY) {
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+  "https://trouvetonplat.vercel.app",
+  "https://trouvetonplat.fr",
+  "https://www.trouvetonplat.fr",
+];
 
 app.use(
   cors({
