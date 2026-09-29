@@ -66,6 +66,18 @@ function Recipe() {
     setServings((currentServings) => currentServings + 1);
   }
 
+  function handlePrint() {
+    const originalTitle = document.title;
+
+    const safeTitle = recipe.title.replace(/[<>:"/\\|?*]/g, "").trim();
+
+    document.title = safeTitle;
+
+    window.print();
+
+    document.title = originalTitle;
+  }
+
   if (loading) {
     return (
       <div className="loading-state">
@@ -105,7 +117,7 @@ function Recipe() {
 
   return (
     <main className="recipe-page">
-      <section className="recipe-hero">
+      <section className="recipe-hero screen-only">
         <div className="recipe-hero-image-wrapper">
           <img
             className="recipe-hero-image"
@@ -155,14 +167,14 @@ function Recipe() {
           <button
             type="button"
             className="print-recipe-button"
-            onClick={() => window.print()}
+            onClick={handlePrint}
           >
             Imprimer / PDF
           </button>
         </div>
       </section>
 
-      <section className="recipe-section recipe-details-card">
+      <section className="recipe-section recipe-details-card screen-only">
         <div className="recipe-tabs">
           <button
             type="button"
@@ -245,7 +257,7 @@ function Recipe() {
       </section>
 
       {hasInstructions && (
-        <section className="recipe-section">
+        <section className="recipe-section screen-only">
           <h2>Préparation</h2>
 
           <div className="preparation-card">
@@ -272,6 +284,109 @@ function Recipe() {
           </div>
         </section>
       )}
+      <section className="print-only print-recipe">
+        <div className="print-recipe-header">
+          <div>
+            <h1>{recipe.title}</h1>
+
+            <div className="print-recipe-meta">
+              {recipe.readyInMinutes && (
+                <span>
+                  <strong>Temps :</strong> {recipe.readyInMinutes} min
+                </span>
+              )}
+
+              <span>
+                <strong>Portions :</strong> {servings}
+              </span>
+            </div>
+          </div>
+
+          {recipe.image && (
+            <img
+              className="print-recipe-image"
+              src={recipe.image}
+              alt={recipe.title}
+            />
+          )}
+        </div>
+
+        <section className="print-section">
+          <h2>Ingrédients</h2>
+
+          <ul className="print-ingredients">
+            {recipe.ingredients.map((ingredient, index) => {
+              const adjustedAmount =
+                ingredient.amount != null
+                  ? ingredient.amount * servingsRatio
+                  : null;
+
+              return (
+                <li key={`print-${ingredient.id}-${index}`}>
+                  {ingredient.image && (
+                    <img
+                      src={`https://img.spoonacular.com/ingredients_100x100/${ingredient.image}`}
+                      alt=""
+                    />
+                  )}
+
+                  <div>
+                    <strong>{ingredient.name}</strong>
+
+                    {adjustedAmount != null && (
+                      <span>
+                        {formatAmount(adjustedAmount)}{" "}
+                        {formatUnit(ingredient.unit)}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {recipe.nutrition?.length > 0 && (
+          <section className="print-section">
+            <h2>Nutrition</h2>
+
+            <div className="print-nutrition">
+              {recipe.nutrition.map((nutrient) => (
+                <div key={`print-${nutrient.name}`}>
+                  <strong>{nutrient.name}</strong>
+                  <span>
+                    {Math.round(nutrient.amount)} {nutrient.unit}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {hasInstructions && (
+          <section className="print-section">
+            <h2>Préparation</h2>
+
+            <div className="print-instructions">
+              {recipe.instructions.map((section, sectionIndex) => (
+                <div key={`print-section-${sectionIndex}`}>
+                  {section.name && <h3>{section.name}</h3>}
+
+                  {section.steps.map((step, stepIndex) => (
+                    <div
+                      className="print-step"
+                      key={`print-${sectionIndex}-${step.number}-${stepIndex}`}
+                    >
+                      <span>{step.number}</span>
+                      <p>{step.step}</p>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </section>
     </main>
   );
 }

@@ -1,12 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-} from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 
 import SearchBar from "../components/SearchBar";
@@ -20,9 +15,7 @@ describe("SearchBar", () => {
     render(<SearchBar onSearch={() => {}} />);
 
     expect(
-      screen.getByPlaceholderText(
-        "Ex : poulet, lasagnes, carbonara...",
-      ),
+      screen.getByPlaceholderText("Ex : Tarte, lasagnes, Pizza..."),
     ).toBeInTheDocument();
 
     expect(
@@ -35,9 +28,7 @@ describe("SearchBar", () => {
 
     render(<SearchBar onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText(
-      "Ex : poulet, lasagnes, carbonara...",
-    );
+    const input = screen.getByPlaceholderText("Ex : Tarte, lasagnes, Pizza...");
 
     fireEvent.change(input, {
       target: {
@@ -45,9 +36,7 @@ describe("SearchBar", () => {
       },
     });
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Rechercher" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Rechercher" }));
 
     expect(onSearch).not.toHaveBeenCalled();
   });
@@ -57,9 +46,7 @@ describe("SearchBar", () => {
 
     render(<SearchBar onSearch={onSearch} />);
 
-    const input = screen.getByPlaceholderText(
-      "Ex : poulet, lasagnes, carbonara...",
-    );
+    const input = screen.getByPlaceholderText("Ex : Tarte, lasagnes, Pizza...");
 
     fireEvent.change(input, {
       target: {
@@ -67,9 +54,7 @@ describe("SearchBar", () => {
       },
     });
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Rechercher" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Rechercher" }));
 
     expect(onSearch).toHaveBeenCalledWith("lasagnes");
   });

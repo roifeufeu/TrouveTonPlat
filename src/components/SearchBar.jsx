@@ -19,7 +19,7 @@ function SearchBar({ onSearch }) {
     <form className="search-bar" onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Ex : poulet, lasagnes, carbonara..."
+        placeholder="Ex : Burger, pizza, tarte aux pommes..."
         value={search}
         onChange={(event) => setSearch(event.target.value)}
       />

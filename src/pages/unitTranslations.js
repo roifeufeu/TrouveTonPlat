@@ -47,6 +47,8 @@ export const unitTranslations = {
   slice: "tranche",
   slices: "tranches",
 
+  links: "saucisses",
+
   clove: "gousse",
   cloves: "gousses",
 
