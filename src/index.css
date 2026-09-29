@@ -159,7 +159,7 @@ main {
 
   .hero {
     min-height: auto;
-    padding: 40px 20px 24px;
+    padding: 40px 20px 80px;
   }
 
   .install-button {
