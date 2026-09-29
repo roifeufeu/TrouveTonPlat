@@ -9,14 +9,18 @@ import Recipe from "./pages/Recipe";
 function App() {
   return (
     <BrowserRouter>
-      <Header />
+      <div className="app-layout">
+        <Header />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/recipe/:id" element={<Recipe />} />
-      </Routes>
+        <div className="app-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/recipe/:id" element={<Recipe />} />
+          </Routes>
+        </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 }

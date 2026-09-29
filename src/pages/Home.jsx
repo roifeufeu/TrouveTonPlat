@@ -210,8 +210,13 @@ function Home() {
         {search && (
           <section className="results">
             <h2>
-              Résultats pour "{search}"{" "}
-              <span className="result-count">({totalResults})</span>
+              Résultats pour "{search}"
+              {!loading && (
+                <>
+                  {" "}
+                  <span className="result-count">({totalResults})</span>
+                </>
+              )}
             </h2>
 
             {loading && recipes.length === 0 && (
@@ -253,7 +258,7 @@ function Home() {
             )}
 
             {!loading && !error && recipes.length === 0 && (
-              <p>Aucune recette trouvée.</p>
+              <div className="empty-results">Aucune recette trouvée.</div>
             )}
           </section>
         )}
