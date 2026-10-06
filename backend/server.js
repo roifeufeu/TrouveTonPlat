@@ -14,6 +14,11 @@ const GOOGLE_TRANSLATE_API_KEY = process.env.GOOGLE_TRANSLATE_API_KEY;
 
 const SPOONACULAR_BASE_URL = "https://api.spoonacular.com";
 
+const BLOCKED_RECIPE_IDS = new Set([
+  681713,
+  // Mets ici les IDs des recettes à bloquer
+]);
+
 const GOOGLE_TRANSLATE_URL =
   "https://translation.googleapis.com/language/translate/v2";
 
@@ -235,11 +240,15 @@ app.get("/api/recipes/search", async (req, res) => {
 
     const results = Array.isArray(data.results) ? data.results : [];
 
-    const titles = results.map((recipe) => recipe.title);
+    const availableResults = results.filter(
+      (recipe) => !BLOCKED_RECIPE_IDS.has(recipe.id),
+    );
+
+    const titles = availableResults.map((recipe) => recipe.title);
 
     const translatedTitles = await translateTexts(titles, "en", "fr");
 
-    const recipes = results.map((recipe, index) => ({
+    const recipes = availableResults.map((recipe, index) => ({
       id: recipe.id,
       title: translatedTitles[index] || recipe.title,
       image: recipe.image,
@@ -266,6 +275,12 @@ app.get("/api/recipes/:id", async (req, res) => {
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({
       error: "Identifiant de recette invalide.",
+    });
+  }
+
+  if (BLOCKED_RECIPE_IDS.has(id)) {
+    return res.status(404).json({
+      error: "Recette indisponible.",
     });
   }
 
@@ -300,6 +315,17 @@ app.get("/api/recipes/:id", async (req, res) => {
     }
 
     const data = await response.json();
+
+    console.log("RECETTE :", data.title);
+    console.log(
+      "INGRÉDIENTS BRUTS :",
+      data.extendedIngredients?.map((ingredient) => ({
+        id: ingredient.id,
+        name: ingredient.name,
+        nameClean: ingredient.nameClean,
+        original: ingredient.original,
+      })),
+    );
 
     const ingredients = Array.isArray(data.extendedIngredients)
       ? data.extendedIngredients
