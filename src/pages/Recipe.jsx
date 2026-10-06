@@ -235,17 +235,20 @@ function Recipe() {
           {activeTab === "nutrition" && (
             <>
               {recipe.nutrition?.length > 0 ? (
-                <div className="nutrition-grid">
-                  {recipe.nutrition.map((nutrient) => (
-                    <div className="nutrition-item" key={nutrient.name}>
-                      <strong>{nutrient.name}</strong>
+                <>
+                  <div className="nutrition-grid">
+                    {recipe.nutrition.map((nutrient) => (
+                      <div className="nutrition-item" key={nutrient.name}>
+                        <strong>{nutrient.name}</strong>
 
-                      <span>
-                        {Math.round(nutrient.amount)} {nutrient.unit}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                        <span>
+                          {Math.round(nutrient.amount * servingsRatio)}{" "}
+                          {nutrient.unit}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <p className="empty-tab-message">
                   Informations nutritionnelles indisponibles.
@@ -346,23 +349,28 @@ function Recipe() {
           </ul>
         </section>
 
-        {recipe.nutrition?.length > 0 && (
-          <section className="print-section">
-            <h2>Nutrition</h2>
+        {recipe.nutrition.length > 0 && (
+          <section className="recipe-section">
+            <h2>Nutrition test v2</h2>
 
-            <div className="print-nutrition">
+            <p className="nutrition-servings">
+              Valeurs pour {servings} portion{servings > 1 ? "s" : ""}
+            </p>
+
+            <div className="nutrition-grid">
               {recipe.nutrition.map((nutrient) => (
-                <div key={`print-${nutrient.name}`}>
+                <div className="nutrition-item" key={nutrient.name}>
                   <strong>{nutrient.name}</strong>
+
                   <span>
-                    {Math.round(nutrient.amount)} {nutrient.unit}
+                    {Math.round(nutrient.amount * servingsRatio)}{" "}
+                    {nutrient.unit}
                   </span>
                 </div>
               ))}
             </div>
           </section>
         )}
-
         {hasInstructions && (
           <section className="print-section">
             <h2>Préparation</h2>
