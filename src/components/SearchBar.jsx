@@ -22,23 +22,14 @@ function SearchBar({ onSearch }) {
       return [];
     }
 
-    // On autocomplete uniquement le premier mot
-    const words = trimmedValue.split(/\s+/);
-
-    if (words.length > 1) {
+    if (trimmedValue.length < 2) {
       return [];
     }
 
-    const currentWord = words[0];
-
-    if (currentWord.length < 2) {
-      return [];
-    }
-
-    const normalizedCurrentWord = normalizeText(currentWord);
+    const normalizedValue = normalizeText(trimmedValue);
 
     return [...new Set(searchTerms)]
-      .filter((term) => normalizeText(term).startsWith(normalizedCurrentWord))
+      .filter((term) => normalizeText(term).startsWith(normalizedValue))
       .sort((a, b) => {
         if (a.length !== b.length) {
           return a.length - b.length;
