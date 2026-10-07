@@ -1414,9 +1414,6 @@ main {
   cursor: pointer;
 }
 
-.search-suggestions li button:hover {
-  background: #f3f4f6;
-}
 .search-wrapper {
   position: relative;
 
@@ -1456,7 +1453,7 @@ main {
 .search-suggestions button {
   width: 100%;
 
-  padding: 13px 16px;
+  padding: 8px 16px;
 
   border: none;
 
@@ -1470,10 +1467,13 @@ main {
   cursor: pointer;
 }
 
-.search-suggestions button:hover {
-  background-color: #fff7ed;
-}
-
 .search-suggestions li:not(:last-child) {
   border-bottom: 1px solid #f3f4f6;
+}
+
+.search-suggestions button.suggestion-active {
+  background-color: #fff7ed;
+}
+.search-suggestions li button {
+  padding: 7px 16px;
 }
