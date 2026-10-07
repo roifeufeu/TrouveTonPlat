@@ -36,6 +36,23 @@ export async function searchRecipes(query, offset = 0, filters = {}) {
   return response.json();
 }
 
+export async function autocompleteRecipes(query, signal) {
+  const response = await fetch(
+    `${BASE_URL}/api/recipes/autocomplete?q=${encodeURIComponent(query)}`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+
+    throw new Error(
+      data.error || "Erreur lors de la récupération des suggestions",
+    );
+  }
+
+  return response.json();
+}
+
 export async function getRecipeById(id) {
   const response = await fetch(`${BASE_URL}/api/recipes/${id}`);
 

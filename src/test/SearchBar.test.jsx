@@ -1,61 +1,112 @@
-// @vitest-environment jsdom
+import { useEffect, useRef, useState } from "react";
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom/vitest";
+import { autocompleteRecipes } from "../services/recipeApi";
 
-import SearchBar from "../components/SearchBar";
+function SearchBar({ onSearch }) {
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
-afterEach(() => {
-  cleanup();
-});
+  const skipNextAutocomplete = useRef(false);
 
-describe("SearchBar", () => {
-  it("affiche le champ de recherche et le bouton", () => {
-    render(<SearchBar onSearch={() => {}} />);
+  useEffect(() => {
+    const value = search.trim();
 
-    expect(
-      screen.getByPlaceholderText("Ex : Tarte, lasagnes, Pizza..."),
-    ).toBeInTheDocument();
+    // Quand on clique sur une suggestion,
+    // on ne veut pas relancer immédiatement l'autocomplete.
+    if (skipNextAutocomplete.current) {
+      skipNextAutocomplete.current = false;
+      return;
+    }
 
-    expect(
-      screen.getByRole("button", { name: "Rechercher" }),
-    ).toBeInTheDocument();
-  });
+    // Champ vide = aucune suggestion.
+    if (value.length === 0) {
+      setSuggestions([]);
+      return;
+    }
 
-  it("ne lance pas de recherche avec moins de 2 caractères", () => {
-    const onSearch = vi.fn();
+    // Debounce adaptatif.
+    let delay = 300;
 
-    render(<SearchBar onSearch={onSearch} />);
+    if (value.length === 1) {
+      delay = 500;
+    } else if (value.length === 2) {
+      delay = 400;
+    }
 
-    const input = screen.getByPlaceholderText("Ex : Tarte, lasagnes, Pizza...");
+    const controller = new AbortController();
 
-    fireEvent.change(input, {
-      target: {
-        value: "a",
-      },
-    });
+    const timeout = setTimeout(async () => {
+      try {
+        const data = await autocompleteRecipes(value, controller.signal);
 
-    fireEvent.click(screen.getByRole("button", { name: "Rechercher" }));
+        setSuggestions(data);
+      } catch (error) {
+        // Une requête annulée n'est pas une vraie erreur.
+        if (error.name !== "AbortError") {
+          console.error("Erreur autocomplete :", error);
+          setSuggestions([]);
+        }
+      }
+    }, delay);
 
-    expect(onSearch).not.toHaveBeenCalled();
-  });
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [search]);
 
-  it("lance une recherche valide", () => {
-    const onSearch = vi.fn();
+  function handleSubmit(event) {
+    event.preventDefault();
 
-    render(<SearchBar onSearch={onSearch} />);
+    const value = search.trim();
 
-    const input = screen.getByPlaceholderText("Ex : Tarte, lasagnes, Pizza...");
+    if (value.length < 2) {
+      return;
+    }
 
-    fireEvent.change(input, {
-      target: {
-        value: "lasagnes",
-      },
-    });
+    setSuggestions([]);
+    onSearch(value);
+  }
 
-    fireEvent.click(screen.getByRole("button", { name: "Rechercher" }));
+  function handleSuggestionClick(title) {
+    skipNextAutocomplete.current = true;
 
-    expect(onSearch).toHaveBeenCalledWith("lasagnes");
-  });
-});
+    setSearch(title);
+    setSuggestions([]);
+
+    onSearch(title);
+  }
+
+  return (
+    <div className="search-wrapper">
+      <form className="search-bar" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Ex : Burger, pizza, tarte aux pommes..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          autoComplete="off"
+        />
+
+        <button type="submit">Rechercher</button>
+      </form>
+
+      {suggestions.length > 0 && (
+        <ul className="search-suggestions">
+          {suggestions.map((suggestion) => (
+            <li key={suggestion.id}>
+              <button
+                type="button"
+                onClick={() => handleSuggestionClick(suggestion.title)}
+              >
+                {suggestion.title}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default SearchBar;

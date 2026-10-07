@@ -147,6 +147,8 @@ function Home() {
   const hasMoreRecipes =
     visibleCount < recipes.length || recipes.length < totalResults;
 
+  const hasActiveFilters = Object.values(activeFilters).some(Boolean);
+
   return (
     <>
       <main>
@@ -258,7 +260,21 @@ function Home() {
             )}
 
             {!loading && !error && recipes.length === 0 && (
-              <div className="empty-results">Aucune recette trouvée.</div>
+              <div className="empty-results">
+                <strong>Aucune recette trouvée pour "{search}"</strong>
+
+                {hasActiveFilters ? (
+                  <p>
+                    Essayez de retirer un ou plusieurs filtres, ou recherchez un
+                    nom de plat plus général.
+                  </p>
+                ) : (
+                  <p>
+                    Vérifiez l'orthographe ou essayez un nom de plat plus
+                    général.
+                  </p>
+                )}
+              </div>
             )}
           </section>
         )}

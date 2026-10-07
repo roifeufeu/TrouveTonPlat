@@ -1361,7 +1361,7 @@ main {
 
 .empty-results {
   margin-top: 20px;
-  padding: 18px 20px;
+  padding: 20px;
 
   background-color: #ffffff;
 
@@ -1369,4 +1369,111 @@ main {
   border-radius: 12px;
 
   color: #6b7280;
+}
+
+.empty-results strong {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #111827;
+}
+
+.empty-results p {
+  margin: 0;
+
+  line-height: 1.6;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  z-index: 100;
+}
+
+.search-suggestions li button {
+  width: 100%;
+  padding: 12px 16px;
+
+  border: none;
+  background: white;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-suggestions li button:hover {
+  background: #f3f4f6;
+}
+.search-wrapper {
+  position: relative;
+
+  width: 100%;
+  max-width: 720px;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 6px 0;
+
+  list-style: none;
+
+  background-color: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+
+  overflow: hidden;
+
+  z-index: 1000;
+}
+
+.search-suggestions li {
+  margin: 0;
+  padding: 0;
+}
+
+.search-suggestions button {
+  width: 100%;
+
+  padding: 13px 16px;
+
+  border: none;
+
+  background-color: white;
+  color: #111827;
+
+  text-align: left;
+
+  font-size: 0.95rem;
+
+  cursor: pointer;
+}
+
+.search-suggestions button:hover {
+  background-color: #fff7ed;
+}
+
+.search-suggestions li:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
 }
