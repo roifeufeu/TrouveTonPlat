@@ -1,80 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-
-import { autocompleteRecipes } from "../services/recipeApi";
+import { useState } from "react";
 
 function SearchBar({ onSearch }) {
   const [search, setSearch] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-
-  const skipNextAutocomplete = useRef(false);
-
-  useEffect(() => {
-    const value = search.trim();
-
-    // Quand on clique sur une suggestion,
-    // on ne veut pas relancer immédiatement l'autocomplete.
-    if (skipNextAutocomplete.current) {
-      skipNextAutocomplete.current = false;
-      return;
-    }
-
-    // Champ vide = aucune suggestion.
-    if (value.length === 0) {
-      setSuggestions([]);
-      return;
-    }
-
-    // Debounce adaptatif.
-    let delay = 300;
-
-    if (value.length === 1) {
-      delay = 500;
-    } else if (value.length === 2) {
-      delay = 400;
-    }
-
-    const controller = new AbortController();
-
-    const timeout = setTimeout(async () => {
-      try {
-        const data = await autocompleteRecipes(value, controller.signal);
-
-        setSuggestions(data);
-      } catch (error) {
-        // Une requête annulée n'est pas une vraie erreur.
-        if (error.name !== "AbortError") {
-          console.error("Erreur autocomplete :", error);
-          setSuggestions([]);
-        }
-      }
-    }, delay);
-
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [search]);
 
   function handleSubmit(event) {
     event.preventDefault();
 
     const value = search.trim();
 
-    if (value.length < 2) {
-      return;
-    }
+    if (value.length < 2) return;
 
-    setSuggestions([]);
     onSearch(value);
-  }
-
-  function handleSuggestionClick(title) {
-    skipNextAutocomplete.current = true;
-
-    setSearch(title);
-    setSuggestions([]);
-
-    onSearch(title);
   }
 
   return (
@@ -90,31 +26,6 @@ function SearchBar({ onSearch }) {
 
         <button type="submit">Rechercher</button>
       </form>
-
-      {suggestions.length > 0 && (
-        <ul className="search-suggestions">
-          {suggestions.map((suggestion) => (
-            <li key={suggestion.id}>
-              <button
-                type="button"
-                className="suggestion-button"
-                onClick={() => handleSuggestionClick(suggestion.title)}
-              >
-                {suggestion.imageType && (
-                  <img
-                    className="suggestion-image"
-                    src={`https://img.spoonacular.com/recipes/${suggestion.id}-90x90.${suggestion.imageType}`}
-                    alt=""
-                    loading="lazy"
-                  />
-                )}
-
-                <span>{suggestion.title}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

@@ -1477,19 +1477,3 @@ main {
 .search-suggestions li:not(:last-child) {
   border-bottom: 1px solid #f3f4f6;
 }
-.suggestion-button {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.suggestion-image {
-  width: 44px;
-  height: 44px;
-
-  object-fit: cover;
-
-  border-radius: 8px;
-
-  flex-shrink: 0;
-}
