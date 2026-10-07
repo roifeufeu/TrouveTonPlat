@@ -213,6 +213,7 @@ app.get("/api/recipes/autocomplete", async (req, res) => {
       suggestions.map((recipe, index) => ({
         id: recipe.id,
         title: translatedTitles[index] || recipe.title,
+        imageType: recipe.imageType,
       })),
     );
   } catch (error) {

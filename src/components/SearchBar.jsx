@@ -97,9 +97,19 @@ function SearchBar({ onSearch }) {
             <li key={suggestion.id}>
               <button
                 type="button"
+                className="suggestion-button"
                 onClick={() => handleSuggestionClick(suggestion.title)}
               >
-                {suggestion.title}
+                {suggestion.imageType && (
+                  <img
+                    className="suggestion-image"
+                    src={`https://img.spoonacular.com/recipes/${suggestion.id}-90x90.${suggestion.imageType}`}
+                    alt=""
+                    loading="lazy"
+                  />
+                )}
+
+                <span>{suggestion.title}</span>
               </button>
             </li>
           ))}
