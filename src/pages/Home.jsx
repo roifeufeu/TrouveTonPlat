@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import SearchBar from "../components/SearchBar";
 import RecipeCard from "../components/RecipeCard";
+import DailyDiscoveries from "../components/DailyDiscoveries.jsx";
 
 import { searchRecipes } from "../services/recipeApi";
 
@@ -208,6 +209,8 @@ function Home() {
             </label>
           </div>
         </section>
+
+        <DailyDiscoveries />
 
         {search && (
           <section className="results">

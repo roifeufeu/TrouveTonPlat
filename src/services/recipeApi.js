@@ -49,3 +49,38 @@ export async function getRecipeById(id) {
 
   return response.json();
 }
+export async function getDiscoveries(filters = {}) {
+  const params = new URLSearchParams();
+
+  if (filters.vegetarian) {
+    params.set("vegetarian", "true");
+  }
+
+  if (filters.vegan) {
+    params.set("vegan", "true");
+  }
+
+  if (filters.noPork) {
+    params.set("noPork", "true");
+  }
+
+  if (filters.glutenFree) {
+    params.set("glutenFree", "true");
+  }
+
+  if (filters.dairyFree) {
+    params.set("dairyFree", "true");
+  }
+
+  const response = await fetch(`${BASE_URL}/api/recipes/discover?${params}`);
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+
+    throw new Error(
+      data.error || "Erreur lors de la récupération des découvertes",
+    );
+  }
+
+  return response.json();
+}

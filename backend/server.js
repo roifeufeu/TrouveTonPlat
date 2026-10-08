@@ -267,6 +267,92 @@ app.get("/api/recipes/search", async (req, res) => {
   }
 });
 
+/* -------------------- DÉCOUVERTES -------------------- */
+
+app.get("/api/recipes/discover", async (req, res) => {
+  const vegetarian = req.query.vegetarian === "true";
+  const vegan = req.query.vegan === "true";
+  const noPork = req.query.noPork === "true";
+  const glutenFree = req.query.glutenFree === "true";
+  const dairyFree = req.query.dairyFree === "true";
+
+  try {
+    const params = new URLSearchParams({
+      number: String(6 + BLOCKED_RECIPE_IDS.size),
+      sort: "random",
+      apiKey: SPOONACULAR_API_KEY,
+    });
+
+    if (vegan) {
+      params.set("diet", "vegan");
+    } else if (vegetarian) {
+      params.set("diet", "vegetarian");
+    }
+
+    if (noPork) {
+      params.set("excludeIngredients", "pork");
+    }
+
+    const intolerances = [];
+
+    if (glutenFree) {
+      intolerances.push("gluten");
+    }
+
+    if (dairyFree) {
+      intolerances.push("dairy");
+    }
+
+    if (intolerances.length > 0) {
+      params.set("intolerances", intolerances.join(","));
+    }
+
+    const response = await fetch(
+      `${SPOONACULAR_BASE_URL}/recipes/complexSearch?${params}`,
+    );
+
+    if (!response.ok) {
+      if (response.status === 402) {
+        return res.status(503).json({
+          error: "Quota Spoonacular atteint. Réessayez plus tard.",
+        });
+      }
+
+      const errorText = await response.text();
+
+      console.error("Erreur découvertes Spoonacular :", errorText);
+
+      throw new Error("Erreur Spoonacular");
+    }
+
+    const data = await response.json();
+
+    const results = Array.isArray(data.results) ? data.results : [];
+
+    const availableResults = results
+      .filter((recipe) => !BLOCKED_RECIPE_IDS.has(recipe.id))
+      .slice(0, 6);
+
+    const titles = availableResults.map((recipe) => recipe.title);
+
+    const translatedTitles = await translateTexts(titles, "en", "fr");
+
+    const discoveries = availableResults.map((recipe, index) => ({
+      id: recipe.id,
+      title: translatedTitles[index] || recipe.title,
+      image: recipe.image,
+    }));
+
+    return res.json(discoveries);
+  } catch (error) {
+    console.error("Erreur découvertes :", error);
+
+    return res.status(500).json({
+      error: "Impossible de récupérer les découvertes.",
+    });
+  }
+});
+
 /* -------------------- DÉTAIL D'UNE RECETTE -------------------- */
 
 app.get("/api/recipes/:id", async (req, res) => {

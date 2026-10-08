@@ -22,7 +22,7 @@ function SearchBar({ onSearch }) {
       return [];
     }
 
-    if (trimmedValue.length < 2) {
+    if (trimmedValue.length < 1) {
       return [];
     }
 
