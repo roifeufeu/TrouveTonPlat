@@ -1687,3 +1687,25 @@ main {
   display: grid;
   gap: 24px;
 }
+.discoveries-preferences {
+  margin-top: 24px;
+}
+
+.discoveries-preferences-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.discoveries-preferences-list button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.discoveries-preferences-list button:disabled {
+  cursor: wait;
+}
+
+.discoveries-refreshing {
+  margin-top: 10px;
+}

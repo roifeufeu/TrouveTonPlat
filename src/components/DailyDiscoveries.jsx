@@ -41,6 +41,8 @@ function DailyDiscoveries() {
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
     async function loadDiscoveries() {
       const today = getToday();
@@ -48,8 +50,17 @@ function DailyDiscoveries() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
 
+        let savedPreferences = DEFAULT_PREFERENCES;
+
         if (stored) {
           const parsed = JSON.parse(stored);
+
+          savedPreferences = {
+            ...DEFAULT_PREFERENCES,
+            ...(parsed.preferences || {}),
+          };
+
+          setPreferences(savedPreferences);
 
           if (
             parsed.date === today &&
@@ -57,28 +68,23 @@ function DailyDiscoveries() {
             parsed.recipes.length === 6
           ) {
             setRecipes(parsed.recipes);
-            setPreferences(parsed.preferences || DEFAULT_PREFERENCES);
-            setLoading(false);
-
             return;
           }
         }
 
-        const newRecipes = await getDiscoveries(DEFAULT_PREFERENCES);
+        const newRecipes = await getDiscoveries(savedPreferences);
 
         const dataToStore = {
           date: today,
-          preferences: DEFAULT_PREFERENCES,
+          preferences: savedPreferences,
           recipes: newRecipes,
         };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore));
 
         setRecipes(newRecipes);
-        setPreferences(DEFAULT_PREFERENCES);
       } catch (error) {
         console.error(error);
-
         setError("Impossible de charger les découvertes.");
       } finally {
         setLoading(false);
@@ -194,6 +200,42 @@ function DailyDiscoveries() {
     return <p>{error}</p>;
   }
 
+  async function togglePreference(preferenceName) {
+    if (refreshing) {
+      return;
+    }
+
+    const newPreferences = {
+      ...preferences,
+      [preferenceName]: !preferences[preferenceName],
+    };
+
+    setPreferences(newPreferences);
+    setRefreshing(true);
+
+    try {
+      const newRecipes = await getDiscoveries(newPreferences);
+
+      setRecipes(newRecipes);
+      setCurrentPage(0);
+
+      const dataToStore = {
+        date: getToday(),
+        preferences: newPreferences,
+        recipes: newRecipes,
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore));
+    } catch (error) {
+      console.error(error);
+
+      // Si la requête échoue, on remet les anciennes préférences.
+      setPreferences(preferences);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   return (
     <section className="discoveries-section">
       <div className="discoveries-header">
@@ -276,6 +318,62 @@ function DailyDiscoveries() {
             aria-label={`Aller à la page ${index + 1}`}
           />
         ))}
+      </div>
+      <div className="discoveries-preferences">
+        <p>Personnaliser mes découvertes</p>
+
+        <div className="discoveries-preferences-list">
+          <button
+            type="button"
+            onClick={() => togglePreference("vegetarian")}
+            disabled={refreshing}
+          >
+            {preferences.vegetarian ? "✓ " : ""}
+            Végétarien
+          </button>
+
+          <button
+            type="button"
+            onClick={() => togglePreference("vegan")}
+            disabled={refreshing}
+          >
+            {preferences.vegan ? "✓ " : ""}
+            Vegan
+          </button>
+
+          <button
+            type="button"
+            onClick={() => togglePreference("noPork")}
+            disabled={refreshing}
+          >
+            {preferences.noPork ? "✓ " : ""}
+            Sans porc
+          </button>
+
+          <button
+            type="button"
+            onClick={() => togglePreference("glutenFree")}
+            disabled={refreshing}
+          >
+            {preferences.glutenFree ? "✓ " : ""}
+            Sans gluten
+          </button>
+
+          <button
+            type="button"
+            onClick={() => togglePreference("dairyFree")}
+            disabled={refreshing}
+          >
+            {preferences.dairyFree ? "✓ " : ""}
+            Sans produits laitiers
+          </button>
+        </div>
+
+        {refreshing && (
+          <p className="discoveries-refreshing">
+            Mise à jour des découvertes...
+          </p>
+        )}
       </div>
     </section>
   );
