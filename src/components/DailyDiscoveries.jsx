@@ -115,20 +115,28 @@ function DailyDiscoveries() {
   }, []);
 
   useEffect(() => {
+    const viewport = viewportRef.current;
+
+    if (!viewport) {
+      return;
+    }
+
     function updateCarouselWidth() {
-      if (viewportRef.current) {
-        setCarouselWidth(viewportRef.current.offsetWidth);
-      }
+      setCarouselWidth(viewport.getBoundingClientRect().width);
     }
 
     updateCarouselWidth();
 
-    window.addEventListener("resize", updateCarouselWidth);
+    const resizeObserver = new ResizeObserver(() => {
+      updateCarouselWidth();
+    });
+
+    resizeObserver.observe(viewport);
 
     return () => {
-      window.removeEventListener("resize", updateCarouselWidth);
+      resizeObserver.disconnect();
     };
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     setCurrentPage(0);
