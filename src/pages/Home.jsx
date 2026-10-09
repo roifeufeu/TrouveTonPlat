@@ -210,8 +210,6 @@ function Home() {
           </div>
         </section>
 
-        <DailyDiscoveries />
-
         {search && (
           <section className="results">
             <h2>
@@ -281,6 +279,8 @@ function Home() {
             )}
           </section>
         )}
+
+        <DailyDiscoveries />
       </main>
     </>
   );
