@@ -402,17 +402,6 @@ app.get("/api/recipes/:id", async (req, res) => {
 
     const data = await response.json();
 
-    console.log("RECETTE :", data.title);
-    console.log(
-      "INGRÉDIENTS BRUTS :",
-      data.extendedIngredients?.map((ingredient) => ({
-        id: ingredient.id,
-        name: ingredient.name,
-        nameClean: ingredient.nameClean,
-        original: ingredient.original,
-      })),
-    );
-
     const ingredients = Array.isArray(data.extendedIngredients)
       ? data.extendedIngredients
       : [];

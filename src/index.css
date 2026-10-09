@@ -2009,3 +2009,17 @@ main {
     margin-top: 14px;
   }
 }
+.recipe-back-button {
+  margin-bottom: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #ea580c;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recipe-back-button:hover {
+  text-decoration: underline;
+}

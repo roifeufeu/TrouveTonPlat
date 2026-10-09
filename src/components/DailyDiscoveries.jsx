@@ -243,8 +243,6 @@ function DailyDiscoveries() {
     setDragStart(event.clientX);
     setDragOffset(0);
     setIsDragging(true);
-
-    event.currentTarget.setPointerCapture(event.pointerId);
   }
 
   function handlePointerMove(event) {
@@ -453,6 +451,7 @@ function DailyDiscoveries() {
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
           onPointerCancel={handlePointerUp}
         >
           <div

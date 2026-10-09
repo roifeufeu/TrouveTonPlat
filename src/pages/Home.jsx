@@ -6,32 +6,70 @@ import DailyDiscoveries from "../components/DailyDiscoveries.jsx";
 
 import { searchRecipes } from "../services/recipeApi";
 
+const SEARCH_STATE_KEY = "trouvetonplat-search-state";
+
+const DEFAULT_FILTERS = {
+  vegetarian: false,
+  vegan: false,
+  noPork: false,
+  glutenFree: false,
+  dairyFree: false,
+};
+
 function Home() {
-  const [search, setSearch] = useState("");
-  const [recipes, setRecipes] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(9);
+  const [savedSearchState] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem(SEARCH_STATE_KEY);
+
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [search, setSearch] = useState(savedSearchState?.search || "");
+
+  const [recipes, setRecipes] = useState(savedSearchState?.recipes || []);
+
+  const [visibleCount, setVisibleCount] = useState(
+    savedSearchState?.visibleCount || 9,
+  );
+
+  const [totalResults, setTotalResults] = useState(
+    savedSearchState?.totalResults || 0,
+  );
+
   const [searchBarKey, setSearchBarKey] = useState(0);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [totalResults, setTotalResults] = useState(0);
 
-  const [vegetarian, setVegetarian] = useState(false);
-  const [vegan, setVegan] = useState(false);
-  const [noPork, setNoPork] = useState(false);
-  const [glutenFree, setGlutenFree] = useState(false);
-  const [dairyFree, setDairyFree] = useState(false);
+  const [vegetarian, setVegetarian] = useState(
+    savedSearchState?.filters?.vegetarian || false,
+  );
 
-  const [activeFilters, setActiveFilters] = useState({
-    vegetarian: false,
-    vegan: false,
-    noPork: false,
-    glutenFree: false,
-    dairyFree: false,
-  });
+  const [vegan, setVegan] = useState(savedSearchState?.filters?.vegan || false);
+
+  const [noPork, setNoPork] = useState(
+    savedSearchState?.filters?.noPork || false,
+  );
+
+  const [glutenFree, setGlutenFree] = useState(
+    savedSearchState?.filters?.glutenFree || false,
+  );
+
+  const [dairyFree, setDairyFree] = useState(
+    savedSearchState?.filters?.dairyFree || false,
+  );
+
+  const [activeFilters, setActiveFilters] = useState(
+    savedSearchState?.activeFilters || DEFAULT_FILTERS,
+  );
 
   useEffect(() => {
     function resetHome() {
+      sessionStorage.removeItem(SEARCH_STATE_KEY);
+
       setSearch("");
       setRecipes([]);
       setVisibleCount(9);
@@ -45,15 +83,14 @@ function Home() {
       setGlutenFree(false);
       setDairyFree(false);
 
-      setActiveFilters({
-        vegetarian: false,
-        vegan: false,
-        noPork: false,
-        glutenFree: false,
-        dairyFree: false,
-      });
+      setActiveFilters(DEFAULT_FILTERS);
 
       setSearchBarKey((current) => current + 1);
+
+      window.scrollTo({
+        top: 0,
+        behavior: "instant",
+      });
     }
 
     window.addEventListener("reset-home", resetHome);
@@ -62,6 +99,19 @@ function Home() {
       window.removeEventListener("reset-home", resetHome);
     };
   }, []);
+
+  useEffect(() => {
+    if (savedSearchState?.scrollY == null) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: savedSearchState.scrollY,
+        behavior: "instant",
+      });
+    });
+  }, [savedSearchState]);
 
   async function handleSearch(query) {
     const filters = {
@@ -102,21 +152,16 @@ function Home() {
   }
 
   async function handleLoadMore() {
-    // Il reste déjà des recettes chargées en mémoire :
-    // aucune requête API nécessaire.
     if (visibleCount < recipes.length) {
       setVisibleCount((current) => Math.min(current + 9, recipes.length));
 
       return;
     }
 
-    // Toutes les recettes récupérées sont déjà affichées
-    // et il n'existe rien d'autre côté Spoonacular.
     if (recipes.length >= totalResults) {
       return;
     }
 
-    // Il faut récupérer le prochain lot de 27 recettes.
     setLoading(true);
     setError("");
 
@@ -130,7 +175,6 @@ function Home() {
 
       setRecipes((currentRecipes) => [...currentRecipes, ...data.results]);
 
-      // On n'affiche que 9 recettes du nouveau lot.
       setVisibleCount((current) => current + 9);
     } catch (error) {
       console.error(error);
@@ -141,6 +185,34 @@ function Home() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function saveSearchState() {
+    if (!search) {
+      return;
+    }
+
+    sessionStorage.setItem(
+      SEARCH_STATE_KEY,
+      JSON.stringify({
+        search,
+        recipes,
+        visibleCount,
+        totalResults,
+
+        filters: {
+          vegetarian,
+          vegan,
+          noPork,
+          glutenFree,
+          dairyFree,
+        },
+
+        activeFilters,
+
+        scrollY: window.scrollY,
+      }),
+    );
   }
 
   const visibleRecipes = recipes.slice(0, visibleCount);
@@ -161,7 +233,11 @@ function Home() {
             quantités nécessaires.
           </p>
 
-          <SearchBar key={searchBarKey} onSearch={handleSearch} />
+          <SearchBar
+            key={searchBarKey}
+            onSearch={handleSearch}
+            initialValue={search}
+          />
 
           <div className="search-filters">
             <label>
@@ -190,6 +266,7 @@ function Home() {
               />
               Sans porc
             </label>
+
             <label>
               <input
                 type="checkbox"
@@ -225,12 +302,15 @@ function Home() {
             {loading && recipes.length === 0 && (
               <div className="loading-state">
                 <div className="spinner"></div>
+
                 <p>Recherche des recettes...</p>
               </div>
             )}
+
             {error && (
               <div className="error-state">
                 <strong>Une erreur est survenue</strong>
+
                 <p>{error}</p>
               </div>
             )}
@@ -244,6 +324,7 @@ function Home() {
                       id={recipe.id}
                       name={recipe.title}
                       image={recipe.image}
+                      onOpen={saveSearchState}
                     />
                   ))}
                 </div>

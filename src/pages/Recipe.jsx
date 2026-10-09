@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { unitTranslations } from "./unitTranslations";
 
 import { getRecipeById } from "../services/recipeApi";
@@ -28,6 +28,7 @@ function formatUnit(unit) {
 
 function Recipe() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [recipe, setRecipe] = useState(null);
   const [servings, setServings] = useState(1);
@@ -117,6 +118,14 @@ function Recipe() {
 
   return (
     <main className="recipe-page">
+      <button
+        type="button"
+        className="recipe-back-button screen-only"
+        onClick={() => navigate(-1)}
+      >
+        ← Retour
+      </button>
+
       <section className="recipe-hero screen-only">
         <div className="recipe-hero-image-wrapper">
           <img

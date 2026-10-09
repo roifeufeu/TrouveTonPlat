@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import searchTerms from "../data/searchTerms.json";
 
-function SearchBar({ onSearch }) {
-  const [search, setSearch] = useState("");
+function SearchBar({ onSearch, initialValue = "" }) {
+  const [search, setSearch] = useState(initialValue);
   const [suggestions, setSuggestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
 
