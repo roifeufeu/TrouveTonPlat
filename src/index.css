@@ -1488,7 +1488,7 @@ main {
 }
 
 .discoveries-header {
-  margin-bottom: 28px;
+  margin-bottom: 8px;
 }
 
 .discoveries-header h2 {
@@ -1523,6 +1523,7 @@ main {
 
   text-decoration: none;
   color: inherit;
+  margin-top: 15px;
 
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 
@@ -1687,25 +1688,73 @@ main {
   display: grid;
   gap: 24px;
 }
+
 .discoveries-preferences {
-  margin-top: 24px;
+  margin-top: 16px;
+  margin-bottom: 12px;
 }
 
-.discoveries-preferences-list {
+.discoveries-preferences-summary {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 1rem;
 }
 
-.discoveries-preferences-list button {
-  padding: 8px 12px;
+.preferences-edit-button {
+  padding: 0;
+
+  border: none;
+  background: none;
+
+  color: #ea580c;
+  font: inherit;
+  font-weight: 600;
+
   cursor: pointer;
 }
 
-.discoveries-preferences-list button:disabled {
+.preferences-edit-button:hover {
+  text-decoration: underline;
+}
+
+.discoveries-preferences-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin-top: 14px;
+}
+
+.preference-button {
+  padding: 8px 14px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: white;
+  color: #111827;
+
+  font: inherit;
+
+  cursor: pointer;
+}
+
+.preference-button.active {
+  border-color: #ea580c;
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.preference-button:disabled {
+  opacity: 0.6;
   cursor: wait;
 }
 
 .discoveries-refreshing {
-  margin-top: 10px;
+  margin: 10px 0 0;
+
+  color: #6b7280;
+  font-size: 0.9rem;
 }

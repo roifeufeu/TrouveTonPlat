@@ -13,6 +13,14 @@ const DEFAULT_PREFERENCES = {
   dairyFree: false,
 };
 
+const PREFERENCE_OPTIONS = [
+  { key: "vegetarian", label: "Végétarien" },
+  { key: "vegan", label: "Vegan" },
+  { key: "noPork", label: "Sans porc" },
+  { key: "glutenFree", label: "Sans gluten" },
+  { key: "dairyFree", label: "Sans produits laitiers" },
+];
+
 function getToday() {
   const now = new Date();
 
@@ -23,16 +31,41 @@ function getToday() {
   return `${year}-${month}-${day}`;
 }
 
+function getPreferencesKey(preferences) {
+  return [
+    preferences.vegetarian,
+    preferences.vegan,
+    preferences.noPork,
+    preferences.glutenFree,
+    preferences.dairyFree,
+  ]
+    .map((value) => (value ? "1" : "0"))
+    .join("");
+}
+
 function DailyDiscoveries() {
   const [recipes, setRecipes] = useState([]);
   const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
+  const [draftPreferences, setDraftPreferences] = useState(DEFAULT_PREFERENCES);
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+    if (window.innerWidth <= 600) {
+      return 1;
+    }
+
+    if (window.innerWidth <= 900) {
+      return 2;
+    }
+
+    return 3;
+  });
   const viewportRef = useRef(null);
 
   const [carouselWidth, setCarouselWidth] = useState(0);
@@ -40,8 +73,6 @@ function DailyDiscoveries() {
   const [dragStart, setDragStart] = useState(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     async function loadDiscoveries() {
@@ -51,6 +82,8 @@ function DailyDiscoveries() {
         const stored = localStorage.getItem(STORAGE_KEY);
 
         let savedPreferences = DEFAULT_PREFERENCES;
+        let recipeSets = {};
+        let sameDay = false;
 
         if (stored) {
           const parsed = JSON.parse(stored);
@@ -61,30 +94,46 @@ function DailyDiscoveries() {
           };
 
           setPreferences(savedPreferences);
+          setDraftPreferences(savedPreferences);
 
-          if (
-            parsed.date === today &&
-            Array.isArray(parsed.recipes) &&
-            parsed.recipes.length === 6
-          ) {
-            setRecipes(parsed.recipes);
-            return;
+          if (parsed.date === today && parsed.recipeSets) {
+            sameDay = true;
+            recipeSets = parsed.recipeSets;
+
+            const currentKey = getPreferencesKey(savedPreferences);
+
+            if (recipeSets[currentKey]) {
+              setRecipes(recipeSets[currentKey]);
+              return;
+            }
           }
         }
 
         const newRecipes = await getDiscoveries(savedPreferences);
 
-        const dataToStore = {
-          date: today,
-          preferences: savedPreferences,
-          recipes: newRecipes,
-        };
+        const currentKey = getPreferencesKey(savedPreferences);
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore));
+        // Nouveau jour :
+        // on supprime les anciens jeux de recettes.
+        if (!sameDay) {
+          recipeSets = {};
+        }
+
+        recipeSets[currentKey] = newRecipes;
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            date: today,
+            preferences: savedPreferences,
+            recipeSets,
+          }),
+        );
 
         setRecipes(newRecipes);
       } catch (error) {
         console.error(error);
+
         setError("Impossible de charger les découvertes.");
       } finally {
         setLoading(false);
@@ -139,9 +188,33 @@ function DailyDiscoveries() {
   }, [loading]);
 
   useEffect(() => {
-    setCurrentPage(0);
-  }, [itemsPerPage]);
+    function updateItemsPerPage() {
+      let newItemsPerPage;
 
+      if (window.innerWidth <= 600) {
+        newItemsPerPage = 1;
+      } else if (window.innerWidth <= 900) {
+        newItemsPerPage = 2;
+      } else {
+        newItemsPerPage = 3;
+      }
+
+      setItemsPerPage((current) => {
+        if (current !== newItemsPerPage) {
+          setCurrentPage(0);
+          return newItemsPerPage;
+        }
+
+        return current;
+      });
+    }
+
+    window.addEventListener("resize", updateItemsPerPage);
+
+    return () => {
+      window.removeEventListener("resize", updateItemsPerPage);
+    };
+  }, []);
   const pages = [];
 
   for (let i = 0; i < recipes.length; i += itemsPerPage) {
@@ -200,6 +273,100 @@ function DailyDiscoveries() {
     setIsDragging(false);
   }
 
+  const activePreferenceLabels = PREFERENCE_OPTIONS.filter(
+    (option) => preferences[option.key],
+  ).map((option) => option.label);
+
+  const preferencesText =
+    activePreferenceLabels.length > 0
+      ? activePreferenceLabels.join(", ")
+      : "Aucun";
+
+  async function applyPreferences() {
+    if (refreshing) {
+      return;
+    }
+
+    const samePreferences =
+      JSON.stringify(draftPreferences) === JSON.stringify(preferences);
+
+    setPreferencesOpen(false);
+
+    if (samePreferences) {
+      return;
+    }
+
+    const newPreferences = {
+      ...draftPreferences,
+    };
+
+    const newKey = getPreferencesKey(newPreferences);
+
+    try {
+      const today = getToday();
+
+      const stored = localStorage.getItem(STORAGE_KEY);
+
+      let recipeSets = {};
+
+      if (stored) {
+        const parsed = JSON.parse(stored);
+
+        if (parsed.date === today && parsed.recipeSets) {
+          recipeSets = parsed.recipeSets;
+        }
+      }
+
+      setCurrentPage(0);
+
+      // Cette combinaison existe déjà aujourd'hui :
+      // on récupère exactement les mêmes recettes.
+      if (recipeSets[newKey]) {
+        setPreferences(newPreferences);
+        setRecipes(recipeSets[newKey]);
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            date: today,
+            preferences: newPreferences,
+            recipeSets,
+          }),
+        );
+
+        return;
+      }
+
+      // Nouvelle combinaison :
+      // on génère un nouveau jeu une seule fois.
+      setRefreshing(true);
+
+      const newRecipes = await getDiscoveries(newPreferences);
+
+      recipeSets[newKey] = newRecipes;
+
+      setPreferences(newPreferences);
+      setRecipes(newRecipes);
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          date: today,
+          preferences: newPreferences,
+          recipeSets,
+        }),
+      );
+    } catch (error) {
+      console.error(error);
+
+      // En cas d'erreur, on garde les
+      // préférences réellement appliquées.
+      setDraftPreferences(preferences);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   if (loading) {
     return <p>Chargement des découvertes...</p>;
   }
@@ -208,48 +375,67 @@ function DailyDiscoveries() {
     return <p>{error}</p>;
   }
 
-  async function togglePreference(preferenceName) {
-    if (refreshing) {
-      return;
-    }
-
-    const newPreferences = {
-      ...preferences,
-      [preferenceName]: !preferences[preferenceName],
-    };
-
-    setPreferences(newPreferences);
-    setRefreshing(true);
-
-    try {
-      const newRecipes = await getDiscoveries(newPreferences);
-
-      setRecipes(newRecipes);
-      setCurrentPage(0);
-
-      const dataToStore = {
-        date: getToday(),
-        preferences: newPreferences,
-        recipes: newRecipes,
-      };
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore));
-    } catch (error) {
-      console.error(error);
-
-      // Si la requête échoue, on remet les anciennes préférences.
-      setPreferences(preferences);
-    } finally {
-      setRefreshing(false);
-    }
-  }
-
   return (
     <section className="discoveries-section">
       <div className="discoveries-header">
         <h2>À découvrir aujourd'hui</h2>
 
         <p>Une sélection de recettes choisies pour vous.</p>
+      </div>
+
+      <div className="discoveries-preferences">
+        <div className="discoveries-preferences-summary">
+          <span>
+            Vos régimes : <strong>{preferencesText}</strong>
+          </span>
+
+          <button
+            type="button"
+            className="preferences-edit-button"
+            disabled={refreshing}
+            onClick={() => {
+              if (preferencesOpen) {
+                applyPreferences();
+              } else {
+                setDraftPreferences(preferences);
+                setPreferencesOpen(true);
+              }
+            }}
+          >
+            {preferencesOpen ? "Terminer" : "Modifier"}
+          </button>
+        </div>
+
+        {preferencesOpen && (
+          <div className="discoveries-preferences-panel">
+            {PREFERENCE_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                className={`preference-button ${
+                  draftPreferences[option.key] ? "active" : ""
+                }`}
+                onClick={() =>
+                  setDraftPreferences((current) => ({
+                    ...current,
+                    [option.key]: !current[option.key],
+                  }))
+                }
+                disabled={refreshing}
+                aria-pressed={draftPreferences[option.key]}
+              >
+                {draftPreferences[option.key] && "✓ "}
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {refreshing && (
+          <p className="discoveries-refreshing">
+            Mise à jour des découvertes...
+          </p>
+        )}
       </div>
 
       <div className="discoveries-carousel">
@@ -318,7 +504,9 @@ function DailyDiscoveries() {
       </div>
 
       <div className="carousel-dots">
-        {Array.from({ length: totalPages }).map((_, index) => (
+        {Array.from({
+          length: totalPages,
+        }).map((_, index) => (
           <button
             key={index}
             className={`carousel-dot ${currentPage === index ? "active" : ""}`}
@@ -326,62 +514,6 @@ function DailyDiscoveries() {
             aria-label={`Aller à la page ${index + 1}`}
           />
         ))}
-      </div>
-      <div className="discoveries-preferences">
-        <p>Personnaliser mes découvertes</p>
-
-        <div className="discoveries-preferences-list">
-          <button
-            type="button"
-            onClick={() => togglePreference("vegetarian")}
-            disabled={refreshing}
-          >
-            {preferences.vegetarian ? "✓ " : ""}
-            Végétarien
-          </button>
-
-          <button
-            type="button"
-            onClick={() => togglePreference("vegan")}
-            disabled={refreshing}
-          >
-            {preferences.vegan ? "✓ " : ""}
-            Vegan
-          </button>
-
-          <button
-            type="button"
-            onClick={() => togglePreference("noPork")}
-            disabled={refreshing}
-          >
-            {preferences.noPork ? "✓ " : ""}
-            Sans porc
-          </button>
-
-          <button
-            type="button"
-            onClick={() => togglePreference("glutenFree")}
-            disabled={refreshing}
-          >
-            {preferences.glutenFree ? "✓ " : ""}
-            Sans gluten
-          </button>
-
-          <button
-            type="button"
-            onClick={() => togglePreference("dairyFree")}
-            disabled={refreshing}
-          >
-            {preferences.dairyFree ? "✓ " : ""}
-            Sans produits laitiers
-          </button>
-        </div>
-
-        {refreshing && (
-          <p className="discoveries-refreshing">
-            Mise à jour des découvertes...
-          </p>
-        )}
       </div>
     </section>
   );
