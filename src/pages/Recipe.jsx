@@ -4,6 +4,7 @@ import { unitTranslations } from "./unitTranslations";
 import { addToHistory } from "../services/storage";
 
 import { getRecipeById } from "../services/recipeApi";
+import { isFavorite, toggleFavorite } from "../services/storage";
 
 function formatAmount(amount) {
   if (amount >= 100) {
@@ -38,6 +39,7 @@ function Recipe() {
   const [error, setError] = useState("");
 
   const [activeTab, setActiveTab] = useState("ingredients");
+  const [favorite, setFavorite] = useState(false);
 
   useEffect(() => {
     async function loadRecipe() {
@@ -46,11 +48,14 @@ function Recipe() {
 
         setRecipe(data);
 
+        setFavorite(isFavorite(data.id));
+
         addToHistory({
           id: data.id,
           title: data.title,
           image: data.image,
         });
+
         setServings(data.servings || 1);
       } catch (error) {
         console.error(error);
@@ -123,6 +128,18 @@ function Recipe() {
   const hasInstructions =
     recipe.instructions?.some((section) => section.steps?.length > 0) || false;
 
+  const handleFavorite = () => {
+    if (!recipe) return;
+
+    toggleFavorite({
+      id: recipe.id,
+      title: recipe.title,
+      image: recipe.image,
+    });
+
+    setFavorite((current) => !current);
+  };
+
   return (
     <main className="recipe-page">
       <button
@@ -189,6 +206,13 @@ function Recipe() {
           </button>
         </div>
       </section>
+
+      <button
+        className={`favorite-button ${favorite ? "active" : ""}`}
+        onClick={handleFavorite}
+      >
+        {favorite ? "♥ Retirer des favoris" : "♡ Ajouter aux favoris"}
+      </button>
 
       <section className="recipe-section recipe-details-card screen-only">
         <div className="recipe-tabs">

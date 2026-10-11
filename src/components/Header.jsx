@@ -4,6 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 function Header() {
   const [installPrompt, setInstallPrompt] = useState(null);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const location = useLocation();
 
   function handleLogoClick() {
@@ -52,16 +54,42 @@ function Header() {
   }
 
   return (
-    <header className={`header ${!installPrompt ? "header-centered" : ""}`}>
+    <header className="header">
       <Link to="/" className="logo" onClick={handleLogoClick}>
         TrouveTonPlat
       </Link>
 
-      {installPrompt && (
-        <button className="install-button" onClick={handleInstall}>
-          Installer l'application
-        </button>
-      )}
+      <div className="header-actions">
+        {installPrompt && (
+          <button className="install-button" onClick={handleInstall}>
+            Installer l'application
+          </button>
+        )}
+
+        <div className="burger-wrapper">
+          <button
+            className="burger-button"
+            onClick={() => setMenuOpen((current) => !current)}
+            aria-label="Ouvrir le menu"
+            aria-expanded={menuOpen}
+            aria-controls="header-menu"
+          >
+            ☰
+          </button>
+
+          {menuOpen && (
+            <div className="burger-menu" id="header-menu">
+              <Link to="/favoris" onClick={() => setMenuOpen(false)}>
+                Favoris
+              </Link>
+
+              <Link to="/historique" onClick={() => setMenuOpen(false)}>
+                Historique
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
     </header>
   );
 }
