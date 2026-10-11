@@ -6,6 +6,9 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Recipe from "./pages/Recipe";
 
+import History from "./pages/History";
+import Favorites from "./pages/Favorites";
+
 function App() {
   return (
     <BrowserRouter>
@@ -16,6 +19,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/recipe/:id" element={<Recipe />} />
+            <Route path="/historique" element={<History />} />
+            <Route path="/favoris" element={<Favorites />} />
           </Routes>
         </div>
 

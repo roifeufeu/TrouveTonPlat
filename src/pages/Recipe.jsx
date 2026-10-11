@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { unitTranslations } from "./unitTranslations";
+import { addToHistory } from "../services/storage";
 
 import { getRecipeById } from "../services/recipeApi";
 
@@ -44,6 +45,12 @@ function Recipe() {
         const data = await getRecipeById(id);
 
         setRecipe(data);
+
+        addToHistory({
+          id: data.id,
+          title: data.title,
+          image: data.image,
+        });
         setServings(data.servings || 1);
       } catch (error) {
         console.error(error);
