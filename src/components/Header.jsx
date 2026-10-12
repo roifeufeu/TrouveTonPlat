@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 function Header() {
@@ -6,7 +6,15 @@ function Header() {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const menuRef = useRef(null);
   const location = useLocation();
+
+  const [currentPath, setCurrentPath] = useState(location.pathname);
+
+  if (currentPath !== location.pathname) {
+    setCurrentPath(location.pathname);
+    setMenuOpen(false);
+  }
 
   function handleLogoClick() {
     if (location.pathname === "/") {
@@ -39,6 +47,20 @@ function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   async function handleInstall() {
     if (!installPrompt) {
       return;
@@ -66,7 +88,7 @@ function Header() {
           </button>
         )}
 
-        <div className="burger-wrapper">
+        <div className="burger-wrapper" ref={menuRef}>
           <button
             className="burger-button"
             onClick={() => setMenuOpen((current) => !current)}

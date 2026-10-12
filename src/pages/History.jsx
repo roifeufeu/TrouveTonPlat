@@ -28,7 +28,7 @@ function History() {
           <p>Les recettes que vous consultez apparaîtront ici.</p>
         </div>
       ) : (
-        <div className="results">
+        <div className="results-grid">
           {history.map((recipe) => (
             <RecipeCard
               key={recipe.id}

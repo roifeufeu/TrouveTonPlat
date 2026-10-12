@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { unitTranslations } from "./unitTranslations";
-import { addToHistory } from "../services/storage";
+import { addToHistory, isFavorite, toggleFavorite } from "../services/storage";
 
 import { getRecipeById } from "../services/recipeApi";
-import { isFavorite, toggleFavorite } from "../services/storage";
 
 function formatAmount(amount) {
   if (amount >= 100) {
@@ -158,7 +157,6 @@ function Recipe() {
             alt={recipe.title}
           />
         </div>
-
         <div className="recipe-hero-content">
           <h1>{recipe.title}</h1>
 
@@ -197,22 +195,21 @@ function Recipe() {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="print-recipe-button"
-            onClick={handlePrint}
-          >
-            Imprimer / PDF
-          </button>
-        </div>
-      </section>
+          <div className="recipe-actions">
+            <button className="print-recipe-button" onClick={handlePrint}>
+              Imprimer / PDF
+            </button>
 
-      <button
-        className={`favorite-button ${favorite ? "active" : ""}`}
-        onClick={handleFavorite}
-      >
-        {favorite ? "♥ Retirer des favoris" : "♡ Ajouter aux favoris"}
-      </button>
+            <button
+              className={`favorite-button ${favorite ? "active" : ""}`}
+              onClick={handleFavorite}
+            >
+              {favorite ? "♥ Retirer des favoris" : "♡ Ajouter aux favoris"}
+            </button>
+          </div>
+        </div>{" "}
+        {/* ferme recipe-hero-content */}
+      </section>
 
       <section className="recipe-section recipe-details-card screen-only">
         <div className="recipe-tabs">
