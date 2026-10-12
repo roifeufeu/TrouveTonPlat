@@ -19,13 +19,13 @@ body {
 
 .header {
   width: 100%;
-  min-height: 72px;
+  min-height: 60px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 48px;
+  padding: 0 40px;
 
   background-color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
@@ -46,7 +46,7 @@ main {
 }
 
 .hero {
-  min-height: 430px;
+  min-height: auto;
 
   display: flex;
   flex-direction: column;
@@ -150,6 +150,7 @@ main {
 
 @media (max-width: 700px) {
   .header {
+    min-height: 60px;
     padding: 0 20px;
   }
 
@@ -159,7 +160,7 @@ main {
 
   .hero {
     min-height: auto;
-    padding: 40px 20px 80px;
+    padding: 56px 20px 40px;
   }
 
   .install-button {
@@ -2039,6 +2040,8 @@ main {
   font-size: 28px;
   cursor: pointer;
   padding: 6px 8px;
+  width: 38px;
+  height: 38px;
 }
 
 .burger-menu {
