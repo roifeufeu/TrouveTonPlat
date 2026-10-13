@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
+import { customRecipes } from "./customRecipes.js";
 
 dotenv.config();
 
@@ -161,6 +162,42 @@ app.get("/api/test", (req, res) => {
   });
 });
 
+function searchCustomRecipes(query, filters) {
+  const normalizedQuery = query.toLowerCase().trim();
+
+  return customRecipes.filter((recipe) => {
+    const matchesSearch = recipe.searchTerms.some((term) =>
+      term.toLowerCase().includes(normalizedQuery),
+    );
+
+    if (!matchesSearch) {
+      return false;
+    }
+
+    if (filters.vegan && !recipe.vegan) {
+      return false;
+    }
+
+    if (filters.vegetarian && !recipe.vegetarian) {
+      return false;
+    }
+
+    if (filters.noPork && !recipe.noPork) {
+      return false;
+    }
+
+    if (filters.glutenFree && !recipe.glutenFree) {
+      return false;
+    }
+
+    if (filters.dairyFree && !recipe.dairyFree) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
 /* -------------------- RECHERCHE DE RECETTES -------------------- */
 
 app.get("/api/recipes/search", async (req, res) => {
@@ -171,6 +208,13 @@ app.get("/api/recipes/search", async (req, res) => {
   const noPork = req.query.noPork === "true";
   const glutenFree = req.query.glutenFree === "true";
   const dairyFree = req.query.dairyFree === "true";
+  const customResults = searchCustomRecipes(query, {
+    vegetarian,
+    vegan,
+    noPork,
+    glutenFree,
+    dairyFree,
+  });
 
   if (query.length < 2 || query.length > 100) {
     return res.status(400).json({
@@ -254,9 +298,15 @@ app.get("/api/recipes/search", async (req, res) => {
       image: recipe.image,
     }));
 
+    const formattedCustomResults = customResults.map((recipe) => ({
+      id: recipe.id,
+      title: recipe.title,
+      image: recipe.image,
+    }));
+
     return res.json({
-      results: recipes,
-      totalResults: data.totalResults || 0,
+      results: [...formattedCustomResults, ...recipes],
+      totalResults: (data.totalResults || 0) + formattedCustomResults.length,
     });
   } catch (error) {
     console.error("Erreur recherche :", error);
@@ -353,10 +403,22 @@ app.get("/api/recipes/discover", async (req, res) => {
   }
 });
 
+function getCustomRecipeById(id) {
+  return customRecipes.find((recipe) => recipe.id === id);
+}
+
 /* -------------------- DÉTAIL D'UNE RECETTE -------------------- */
 
 app.get("/api/recipes/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const rawId = req.params.id;
+
+  const customRecipe = getCustomRecipeById(rawId);
+
+  if (customRecipe) {
+    return res.json(customRecipe);
+  }
+
+  const id = Number(rawId);
 
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({
