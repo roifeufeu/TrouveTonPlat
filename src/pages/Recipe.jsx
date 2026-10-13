@@ -27,6 +27,18 @@ function formatUnit(unit) {
   return unitTranslations[normalizedUnit] || unit;
 }
 
+function getIngredientImageUrl(image) {
+  if (!image) {
+    return "";
+  }
+
+  if (image.startsWith("/")) {
+    return image;
+  }
+
+  return `https://img.spoonacular.com/ingredients_100x100/${image}`;
+}
+
 function Recipe() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -248,7 +260,7 @@ function Recipe() {
                     {ingredient.image && (
                       <img
                         className="ingredient-image"
-                        src={`https://img.spoonacular.com/ingredients_100x100/${ingredient.image}`}
+                        src={getIngredientImageUrl(ingredient.image)}
                         alt={ingredient.name}
                       />
                     )}
@@ -364,10 +376,7 @@ function Recipe() {
               return (
                 <li key={`print-${ingredient.id}-${index}`}>
                   {ingredient.image && (
-                    <img
-                      src={`https://img.spoonacular.com/ingredients_100x100/${ingredient.image}`}
-                      alt=""
-                    />
+                    <img src={getIngredientImageUrl(ingredient.image)} alt="" />
                   )}
 
                   <div>
