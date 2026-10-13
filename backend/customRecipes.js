@@ -401,4 +401,251 @@ export const customRecipes = [
       },
     ],
   },
+  {
+    id: "custom-raclette",
+    title: "Raclette classique",
+    image: "/recipes/raclette.webp",
+
+    servings: 4,
+    readyInMinutes: 35,
+
+    vegetarian: false,
+    vegan: false,
+    noPork: false,
+    glutenFree: true,
+    dairyFree: false,
+
+    searchTerms: ["raclette", "raclette classique"],
+
+    ingredients: [
+      {
+        id: "potato",
+        name: "Pommes de terre",
+        amount: 1,
+        unit: "kg",
+        image: "potatoes-yukon-gold.png",
+      },
+      {
+        id: "raclette-cheese",
+        name: "Fromage à raclette",
+        amount: 800,
+        unit: "g",
+        image: "/ingredients/raclette-cheese.webp",
+      },
+      {
+        id: 10151,
+        name: "Jambon",
+        amount: 200,
+        unit: "g",
+        image: "ham-whole.jpg",
+      },
+      {
+        id: 7071,
+        name: "Rosette",
+        amount: 150,
+        unit: "g",
+        image: "salami.jpg",
+      },
+      {
+        id: 11937,
+        name: "Cornichons",
+        amount: 200,
+        unit: "g",
+        image: "dill-pickles.jpg",
+      },
+      {
+        id: "onion",
+        name: "Oignons",
+        amount: 2,
+        unit: "",
+        image: "brown-onion.png",
+      },
+    ],
+
+    nutrition: [
+      {
+        name: "Calories",
+        amount: 1310.63,
+        unit: "kcal",
+      },
+      {
+        name: "Protéines",
+        amount: 71.75,
+        unit: "g",
+      },
+      {
+        name: "Lipides",
+        amount: 89.53,
+        unit: "g",
+      },
+      {
+        name: "Glucides",
+        amount: 55.29,
+        unit: "g",
+      },
+      {
+        name: "Sucres",
+        amount: 5.58,
+        unit: "g",
+      },
+      {
+        name: "Fibres",
+        amount: 6.93,
+        unit: "g",
+      },
+      {
+        name: "Sodium",
+        amount: 3170.2,
+        unit: "mg",
+      },
+    ],
+
+    instructions: [
+      {
+        name: "",
+        steps: [
+          {
+            number: 1,
+            step: "Faites cuire les pommes de terre dans de l’eau salée jusqu’à ce qu’elles soient tendres.",
+          },
+          {
+            number: 2,
+            step: "Disposez le fromage, la charcuterie, les cornichons et les oignons sur la table.",
+          },
+          {
+            number: 3,
+            step: "Faites fondre le fromage à raclette dans l’appareil à raclette.",
+          },
+          {
+            number: 4,
+            step: "Versez le fromage fondu sur les pommes de terre et accompagnez de charcuterie et de condiments.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "custom-raclette-sans-porc",
+    title: "Raclette sans porc",
+    image: "/recipes/raclette-sans-porc.webp",
+
+    servings: 4,
+    readyInMinutes: 35,
+
+    vegetarian: false,
+    vegan: false,
+    noPork: true,
+    glutenFree: true,
+    dairyFree: false,
+
+    searchTerms: ["raclette", "raclette sans porc"],
+
+    ingredients: [
+      {
+        id: "potato",
+        name: "Pommes de terre",
+        amount: 1,
+        unit: "kg",
+        image: "potatoes-yukon-gold.png",
+      },
+      {
+        id: "raclette-cheese",
+        name: "Fromage à raclette",
+        amount: 800,
+        unit: "g",
+        image: "/ingredients/raclette-cheese.webp",
+      },
+      {
+        id: "turkey-ham",
+        name: "Jambon de dinde",
+        amount: 200,
+        unit: "g",
+        image: "/ingredients/turkey-ham.webp",
+      },
+      {
+        id: "turkey-bacon",
+        name: "Lardons de volaille",
+        amount: 150,
+        unit: "g",
+        image: "bacon-turkey.jpg",
+      },
+
+      {
+        id: 11937,
+        name: "Cornichons",
+        amount: 200,
+        unit: "g",
+        image: "dill-pickles.jpg",
+      },
+      {
+        id: "onion",
+        name: "Oignons",
+        amount: 2,
+        unit: "",
+        image: "brown-onion.png",
+      },
+    ],
+
+    nutrition: [
+      {
+        name: "Calories",
+        amount: 1301.25,
+        unit: "kcal",
+      },
+      {
+        name: "Protéines",
+        amount: 74.38,
+        unit: "g",
+      },
+      {
+        name: "Lipides",
+        amount: 87.34,
+        unit: "g",
+      },
+      {
+        name: "Glucides",
+        amount: 55.85,
+        unit: "g",
+      },
+      {
+        name: "Sucres",
+        amount: 5.58,
+        unit: "g",
+      },
+      {
+        name: "Fibres",
+        amount: 6.93,
+        unit: "g",
+      },
+      {
+        name: "Sodium",
+        amount: 3179.57,
+        unit: "mg",
+      },
+    ],
+
+    instructions: [
+      {
+        name: "",
+        steps: [
+          {
+            number: 1,
+            step: "Faites cuire les pommes de terre dans de l’eau salée jusqu’à ce qu’elles soient tendres.",
+          },
+          {
+            number: 2,
+            step: "Disposez le fromage, le jambon de dinde, les lardons de volaille, les cornichons et les oignons sur la table.",
+          },
+          {
+            number: 3,
+            step: "Faites fondre le fromage à raclette dans l’appareil à raclette.",
+          },
+          {
+            number: 4,
+            step: "Versez le fromage fondu sur les pommes de terre et accompagnez des garnitures sans porc.",
+          },
+        ],
+      },
+    ],
+  },
 ];

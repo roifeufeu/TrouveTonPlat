@@ -647,65 +647,6 @@ app.get("/api/ingredients/search", async (req, res) => {
   }
 });
 
-app.get(
-  "/api/custom-recipes/tartiflette-sans-porc/nutrition",
-  async (req, res) => {
-    try {
-      const body = {
-        title: "Tartiflette sans porc",
-        servings: 4,
-        ingredients: [
-          "1 kg potatoes",
-          "450 g reblochon cheese",
-          "200 g turkey bacon",
-          "2 onions",
-          "200 ml sour cream",
-          "1 clove garlic",
-        ],
-        instructions: "",
-      };
-
-      const params = new URLSearchParams({
-        includeNutrition: "true",
-        includeTaste: "false",
-        apiKey: SPOONACULAR_API_KEY,
-      });
-
-      const response = await fetch(
-        `${SPOONACULAR_BASE_URL}/recipes/analyze?${params}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        },
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        console.error(
-          "Erreur analyse nutrition Tartiflette sans porc :",
-          errorText,
-        );
-
-        throw new Error("Erreur Spoonacular");
-      }
-
-      const data = await response.json();
-
-      return res.json(data);
-    } catch (error) {
-      console.error("Erreur nutrition tartiflette sans porc :", error);
-
-      return res.status(500).json({
-        error: "Impossible de calculer la nutrition.",
-      });
-    }
-  },
-);
-
 /* -------------------- ROUTE INCONNUE -------------------- */
 
 app.use((req, res) => {
