@@ -344,7 +344,7 @@ function Recipe() {
             <div className="print-recipe-meta">
               {recipe.readyInMinutes && (
                 <span>
-                  <strong>Temps :</strong> {recipe.readyInMinutes} min
+                  <strong>Temps Max :</strong> {recipe.readyInMinutes} min
                 </span>
               )}
 
