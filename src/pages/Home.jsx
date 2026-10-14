@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import searchFallbacks from "../data/searchFallbacks.json";
 
 import SearchBar from "../components/SearchBar";
 import RecipeCard from "../components/RecipeCard";
@@ -16,6 +17,24 @@ const DEFAULT_FILTERS = {
   dairyFree: false,
 };
 
+function normalizeSearchText(text) {
+  return text
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function getSearchFallback(query) {
+  const normalizedQuery = normalizeSearchText(query);
+
+  const match = Object.entries(searchFallbacks).find(
+    ([term]) => normalizeSearchText(term) === normalizedQuery,
+  );
+
+  return match ? match[1] : null;
+}
+
 function Home() {
   const [savedSearchState] = useState(() => {
     try {
@@ -28,6 +47,14 @@ function Home() {
   });
 
   const [search, setSearch] = useState(savedSearchState?.search || "");
+
+  const [activeSearchQuery, setActiveSearchQuery] = useState(
+    savedSearchState?.activeSearchQuery || savedSearchState?.search || "",
+  );
+
+  const [fallbackTerm, setFallbackTerm] = useState(
+    savedSearchState?.fallbackTerm || "",
+  );
 
   const [recipes, setRecipes] = useState(savedSearchState?.recipes || []);
 
@@ -71,6 +98,8 @@ function Home() {
       sessionStorage.removeItem(SEARCH_STATE_KEY);
 
       setSearch("");
+      setActiveSearchQuery("");
+      setFallbackTerm("");
       setRecipes([]);
       setVisibleCount(9);
       setLoading(false);
@@ -125,6 +154,9 @@ function Home() {
     setActiveFilters(filters);
 
     setSearch(query);
+    setActiveSearchQuery(query);
+    setFallbackTerm("");
+
     setLoading(true);
     setError("");
 
@@ -135,8 +167,37 @@ function Home() {
     try {
       const data = await searchRecipes(query, 0, filters);
 
-      setRecipes(data.results);
-      setTotalResults(data.totalResults);
+      // La recherche exacte a trouvé quelque chose
+      if (data.results.length > 0) {
+        setRecipes(data.results);
+        setTotalResults(data.totalResults);
+        setActiveSearchQuery(query);
+        return;
+      }
+
+      // Aucun résultat exact : on regarde si un fallback existe
+      const fallback = getSearchFallback(query);
+
+      if (!fallback) {
+        setRecipes([]);
+        setTotalResults(0);
+        return;
+      }
+
+      // Deuxième recherche avec le terme plus général
+      const fallbackData = await searchRecipes(fallback, 0, filters);
+
+      if (fallbackData.results.length === 0) {
+        setRecipes([]);
+        setTotalResults(0);
+        return;
+      }
+
+      setRecipes(fallbackData.results);
+      setTotalResults(fallbackData.totalResults);
+
+      setActiveSearchQuery(fallback);
+      setFallbackTerm(fallback);
     } catch (error) {
       console.error(error);
 
@@ -166,7 +227,11 @@ function Home() {
     setError("");
 
     try {
-      const data = await searchRecipes(search, recipes.length, activeFilters);
+      const data = await searchRecipes(
+        activeSearchQuery,
+        recipes.length,
+        activeFilters,
+      );
 
       if (data.results.length === 0) {
         setTotalResults(recipes.length);
@@ -188,7 +253,7 @@ function Home() {
   }
 
   function saveSearchState() {
-    if (!search) {
+    if ((!search, activeSearchQuery, fallbackTerm)) {
       return;
     }
 
@@ -289,8 +354,18 @@ function Home() {
 
         {search && (
           <section className="results">
+            {fallbackTerm && !loading && recipes.length > 0 && (
+              <div className="fallback-results">
+                <strong>Aucun résultat exact pour "{search}".</strong>
+                <p>
+                  Voici des recettes de {fallbackTerm} qui pourraient vous
+                  intéresser.
+                </p>
+              </div>
+            )}
+
             <h2>
-              Résultats pour "{search}"
+              Résultats pour "{fallbackTerm || search}"
               {!loading && (
                 <>
                   {" "}

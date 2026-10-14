@@ -397,7 +397,7 @@ function Recipe() {
 
         {recipe.nutrition.length > 0 && (
           <section className="recipe-section">
-            <h2>Nutrition test v2</h2>
+            <h2>Nutrition</h2>
 
             <p className="nutrition-servings">
               Valeurs pour {servings} portion{servings > 1 ? "s" : ""}

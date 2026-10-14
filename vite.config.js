@@ -10,11 +10,10 @@ export default defineConfig({
       registerType: "autoUpdate",
 
       workbox: {
- 	 globPatterns: [],
- 	 cleanupOutdatedCaches: true,
- 	 skipWaiting: true,
- 	 clientsClaim: true,
-	},
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
+      },
 
       manifest: {
         name: "Trouve Ton Plat",

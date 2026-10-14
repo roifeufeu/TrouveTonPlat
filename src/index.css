@@ -1487,6 +1487,7 @@ main {
 
 .discoveries-header {
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .discoveries-header h2 {
@@ -1566,7 +1567,7 @@ main {
 
 @media (max-width: 600px) {
   .discoveries-section {
-    padding: 36px 16px 48px;
+    padding: 4px 16px 48px;
   }
 
   .discoveries-grid {
@@ -1690,11 +1691,16 @@ main {
 .discoveries-preferences {
   margin-top: 16px;
   margin-bottom: 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .discoveries-preferences-summary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 
   font-size: 1rem;
@@ -2348,4 +2354,20 @@ main {
 
 .favorite-card-remove:hover {
   background-color: #fff7ed;
+}
+.fallback-results {
+  margin: 12px 0 24px;
+  padding: 14px 16px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+}
+
+.fallback-results strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.fallback-results p {
+  margin: 0;
 }
