@@ -1,67 +1,41 @@
-# Projet Recettes
+# TrouveTonPlat
 
-Application web permettant de rechercher un plat et d'obtenir rapidement
-ses ingrédients, les quantités nécessaires et des informations nutritionnelles.
+TrouveTonPlat est une application web permettant de rechercher facilement des recettes selon ses envies et ses contraintes alimentaires.
 
-🌐 Application : https://projet-recettes.vercel.app
+🌐 **Site :** https://trouvetonplat.fr
 
-## Fonctionnalités
+## Aperçu
 
-- Recherche de recettes en français
-- Affichage de plusieurs résultats avec image
-- Page détaillée pour chaque recette
-- Liste des ingrédients et quantités
-- Informations nutritionnelles
-- Traduction automatique des recherches et des données
-- Interface responsive pour ordinateur et mobile
-- Progressive Web App (PWA)
-- Installation de l'application sur un appareil compatible
-- Gestion des états de chargement et des erreurs
-- Tests automatisés de composants React
+L'objectif de TrouveTonPlat est de rendre la recherche de recettes plus simple et plus agréable, en proposant des résultats adaptés aux préférences de l'utilisateur tout en limitant les recherches sans résultat.
 
-## Technologies utilisées
+Le projet utilise principalement l'API Spoonacular, complétée par plusieurs fonctionnalités développées autour de l'expérience utilisateur.
 
-### Frontend
+## Fonctionnalités principales
 
-- React
-- Vite
-- React Router
-- CSS
-- Vite PWA
-- Vitest
-- React Testing Library
+- 🔎 Recherche de recettes avec autocomplétion
+- 🥗 Filtres : végétarien, végan, sans porc, sans gluten et sans produits laitiers
+- 🔄 Recherche alternative lorsqu'une requête trop précise ne retourne aucun résultat
+- ⭐ Gestion des recettes favorites
+- 💡 Découvertes quotidiennes adaptées aux préférences
+- 🧭 Conservation de la recherche, des filtres et de la position lors du retour depuis une recette
+- 👥 Adaptation des quantités selon le nombre de portions
+- 📊 Informations nutritionnelles
+- 🖨️ Version imprimable / PDF des recettes
+- 📱 Interface responsive et installation en PWA
 
-### Backend
+## Aperçu du site
 
-- Node.js
-- Express
-- CORS
-- express-rate-limit
-- dotenv
+<img src="./public/screenshots/home.png" alt="Page d'accueil de TrouveTonPlat" width="900">
 
-### APIs externes
+<img src="./public/screenshots/recipe.png" alt="Page recette de TrouveTonPlat" width="900">
 
-- Spoonacular API
-- Google Cloud Translation API
+## Technologies
 
-### Déploiement
+**Frontend :** React, JavaScript, HTML, CSS  
+**Backend :** Node.js, Express  
+**API :** Spoonacular  
+**Déploiement :** Vercel, Railway
 
-- Vercel pour le frontend
-- Railway pour le backend
+---
 
-## Architecture
-
-L'application est séparée en deux parties principales :
-
-```text
-Utilisateur
-    │
-    ▼
-React / Vite / PWA
-    │
-    ▼
-Backend Express
-    │
-    ├──────────────► Google Translation API
-    │
-    └──────────────► Spoonacular API
+Projet personnel réalisé dans le cadre de mon portfolio de développement web.
